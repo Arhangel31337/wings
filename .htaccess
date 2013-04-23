@@ -1,0 +1,19 @@
+php_flag display_errors on
+php_flag log_errors on
+
+php_flag register_globals Off
+php_flag magic_quotes_gpc Off
+php_flag magic_quotes_runtime Off
+
+php_value date.timezone Europe/Moscow
+
+RewriteEngine on
+Options +FollowSymlinks
+RewriteBase /
+
+#RewriteCond %{HTTP_HOST} !^arhangel31337$ [NC]
+#RewriteRule ^(.*)$ http://www.arhangel31337/$1 [R=301,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f 
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule (.*) ?pathname=$1&%{QUERY_STRING}
