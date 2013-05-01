@@ -4,8 +4,8 @@ namespace Applications\FrontEnd\Index;
 
 class View
 {
-	public function __construct()
+	final public function __construct()
 	{
-		\Wings::$view['tpl'] = 'index.tpl';
+		\Wings::$view['tpl'] = 'default.tpl';
 	}
 }

@@ -8,13 +8,18 @@ class Autoloader
 	
 	public static function ArrayFiles($filePath)
 	{
-		$dataFile = \Wings::$dir . 'Compile/' . \str_replace(array('/', '.'), '_', \str_replace($_SERVER['DOCUMENT_ROOT']. '/', '', $filePath)) . '.dat';
+		if (\substr($_SERVER['DOCUMENT_ROOT'], -1) !== '/') $dataFile = \str_replace($_SERVER['DOCUMENT_ROOT'] . '/', '', $filePath);
+		else $dataFile = \str_replace($_SERVER['DOCUMENT_ROOT'], '', $filePath);
+		
+		$dataFile = \Wings::$dir . 'Compile/' . \str_replace(array('/', '.'), '_', $dataFile) . '.dat';
 		
 		if (!\file_exists($dataFile) || \filemtime($dataFile) <= \filemtime($filePath))
 		{
 			$result = require $filePath;
 			
-			if (($file = \fopen($dataFile, 'w')))
+			$file = \fopen($dataFile, 'w');
+			
+			if ($file)
 			{
 				\fwrite($file, \serialize($result));
 				\fclose($file);
@@ -39,5 +44,3 @@ class Autoloader
 }
 
 \spl_autoload_register('\Wings\Autoloader::Autoload');
-
-?>

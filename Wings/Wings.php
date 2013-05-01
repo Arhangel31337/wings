@@ -43,6 +43,18 @@ class Wings
 	{
 		$settings = \Wings\Autoloader::ArrayFiles(self::$dir . 'config.php');
 		
+		foreach ($settings['php'] as $key => $value) ini_set($key, $value);
+		
+		if ($settings['host']['wwwNecessarily'])
+		{
+			if (isset($_SERVER['HTTPS'])) $http = 'https://';
+			else $http = 'http://';
+			
+			if(strpos($_SERVER['HTTP_HOST'], 'www.') === false) \Wings\Header::Location($http . 'www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+		}
+		
+		\Wings\Header::Charset($settings['host']['charset']);
+		
 		\Wings\Autoloader::$debug = $settings['debug']['autoload'];
 		\Wings\Exception::$debug = $settings['debug']['exception'];
 		\Wings\Exception::$debugType = $settings['debug']['excType'];
@@ -67,9 +79,11 @@ class Wings
 		if (self::$workspace === null) self::$workspace = $workspaceBasic;
 		else array_splice(self::$pathname, 0, 1);
 		
+		self::$workspace['host'] = str_replace('www.', '', $_SERVER['HTTP_HOST']);
+		
 		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']))
 		{
-			if ($_SERVER['HTTP_X_REQUESTED_WITH']==='XMLHttpRequest') self::$ajax = true;
+			if ($_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') self::$ajax = true;
 			else self::$ajax = false;
 		}
 		
@@ -95,8 +109,6 @@ class Wings
 	
 	final public function View()
 	{
-		header('Content-Type: text/html; charset=utf-8');
-		
 		if (self::$view['type'] === 'http')
 		{
 			unset(self::$view['type']);
