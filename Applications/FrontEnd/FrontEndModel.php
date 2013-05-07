@@ -11,16 +11,18 @@ class FrontEndModel
 				pt.`MVC` AS name,
 				pt.`method` AS method
 			FROM
-				`hosts` h,
+				`Hosts` h,
 				`Pages` p,
-				`PageTypes` pt
+				`PageTypes` pt,
+				`Workspaces` w
 			WHERE
 				p.`URL` LIKE :pageURL AND
-				p.`hostID` = h.`ID` AND
-				h.`name` LIKE :host AND
+				p.`isActive` = 1 AND
 				p.`pageTypeID` = pt.`ID` AND
-				pt.`workspace` LIKE :workspace AND
-				p.`isActive` = 1
+				pt.`workspaceID` = w.`ID` AND
+				w.`name` LIKE :workspace AND
+				w.`hostID` = h.`ID` AND
+				h.`name` LIKE :host
 		';
 		
 		$args = array(
