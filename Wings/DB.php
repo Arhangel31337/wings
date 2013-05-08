@@ -182,7 +182,7 @@ class DB
 	 *
 	 * @return PDOStatement - объект оператора
 	 */
-	public static function Select($table, $select, $wheres = null, $order = null, $args = null)
+	public static function Select($table, $select, $wheres = null, $args = null, $order = null)
 	{
 		$query = 'SELECT ' . $select . ' FROM `' . $table . '`';
 		

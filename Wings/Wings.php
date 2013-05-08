@@ -3,10 +3,12 @@
 class Wings
 {
 	public static $ajax;
+	public static $cookie = array();
 	public static $dir;
 	public static $get = array();
 	public static $pathname = array('');
 	public static $post = array();
+	public static $session = array();
 	public static $smarty;
 	public static $view;
 	public static $workspace;
@@ -25,6 +27,8 @@ class Wings
 	
 	final private function GlobalsInterpretation()
 	{
+		session_start();
+		
 		self::$get = $_GET;
 		
 		if (isset($_GET['pathname']))
@@ -37,6 +41,7 @@ class Wings
 		}
 		
 		self::$post = $_POST;
+		self::$session = $_SESSION;
 	}
 	
 	final private function Initialize()

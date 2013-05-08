@@ -1,6 +1,6 @@
 <?php
 
-namespace Applications\FrontEnd;
+namespace Applications\BackEnd;
 
 class Workspace
 {
