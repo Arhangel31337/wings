@@ -11,5 +11,3 @@ final class Controller
     	new View($args);
     }
 }
-
-?>

@@ -98,5 +98,3 @@ class Exception extends \Exception
 \set_error_handler(\create_function('$errorNumber, $errorString, $errorFile, $errorLine, $errorContext', '\Wings\Exception::Error($errorNumber, $errorString, $errorFile, $errorLine, $errorContext);'), E_ALL);
 \set_exception_handler(\create_function('$exceptionHandler', '\Wings\Exception::Exception($exceptionHandler);'));
 \register_shutdown_function(\create_function('', '\Wings\Exception::Shutdown();'));
-
-?>

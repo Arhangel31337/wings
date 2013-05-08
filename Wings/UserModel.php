@@ -9,5 +9,3 @@ class UserModel
 		DB::Select('Users', '*', array(), array());
 	}
 }
-
-?>

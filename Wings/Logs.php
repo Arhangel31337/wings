@@ -42,5 +42,3 @@ class Logs
 		\fclose($file);
 	}
 }
-
-?>

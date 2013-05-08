@@ -23,5 +23,3 @@ $timeEnd2 = $timeEnd2[1] + $timeEnd2[0];
 $timeDur = $timeEnd - $timeStart;
 
 echo '<!-- Время генерации страницы: ' . $timeDur . ' -->';
-
-?>

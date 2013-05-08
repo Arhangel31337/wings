@@ -12,5 +12,3 @@ function trace($toTrace)
 	echo var_dump($toTrace);
 	echo '</pre>';
 }
-
-?>

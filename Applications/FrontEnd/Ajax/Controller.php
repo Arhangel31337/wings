@@ -5,5 +5,3 @@ final class Controller
 {
 
 }
-
-?>
