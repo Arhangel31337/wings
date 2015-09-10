@@ -75,19 +75,33 @@ p.filePath {
 		<h2>Stack</h2>
 		<hr color="#D7DFDF" size="1" noshade />
 <?php 
-if (!empty(self::$errorTrace) && self::$errorTrace[0]['function'] != 'RegisterShutdownFunction') {
-foreach (self::$errorTrace as $key => $value) {?>
+if (!empty(self::$errorTrace) && self::$errorTrace[0]['function'] != 'RegisterShutdownFunction')
+{
+	foreach (self::$errorTrace as $key => $value)
+	{
+		if (isset($value['file']))
+		{
+?>
 		<p class="filePath"><?php echo $value['file'];?></p>
 		<pre class="brush: php; first-line: <?php echo $value['line'];?>;"><?php echo self::GetStringInFile($value['file'], $value['line']); ?></pre>
-<?php } ?>
 <?php
-if (isset($value['args']) && !empty($value['args'])) { ?>
-		<pre class="brush: php;"><?php foreach ($value['args'] as $key2 => $value2) { print_r($value2); } ?></pre>
-<?php } }
-else { ?>
+			if (isset($value['args']) && !empty($value['args']) && \strpos($value['file'], 'Smarty') === false)
+			{
+?>
+		<pre class="brush: php;"><?php print_r($value['args']); ?></pre>
+<?php 
+			}
+		}
+	}
+}
+else
+{
+?>
 		<p class="filePath"><?php echo self::$errorFile;?></p>
 		<pre class="brush: php; first-line: <?php echo self::$errorLine;?>;"><?php echo self::GetStringInFile(self::$errorFile, self::$errorLine); ?></pre>
-<?php } ?>
+<?php
+}
+?>
 	</div>
 </body>
 </html>

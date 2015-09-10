@@ -33,7 +33,7 @@ class Exception extends \Exception
 			30719=> 'All'
 	);
 	
-    private static function Clear()
+    private static function clear()
     {
         self::$errorNumber = null;
         self::$errorMessage = null;
@@ -43,7 +43,7 @@ class Exception extends \Exception
         self::$errorTrace = null;
     }
     
-	public static function Error($errorNumber, $errorString, $errorFile, $errorLine, $errorContext = '')
+	public static function error($errorNumber, $errorString, $errorFile, $errorLine, $errorContext = '')
     {
         self::$errorNumber = $errorNumber;
         self::$errorMessage = \preg_replace('/\[.*\]/siU', '', $errorString);
@@ -54,7 +54,7 @@ class Exception extends \Exception
         self::Report('Report' . self::$debugType);
     }
     
-    public static function Exception($exceptionHandler)
+    public static function exception($exceptionHandler)
     {
         self::$errorNumber = $exceptionHandler->code;
         self::$errorMessage = $exceptionHandler->message;
@@ -65,26 +65,31 @@ class Exception extends \Exception
         self::Report('Report' . self::$debugType);
     }
 	
-    private static function GetStringInFile($fileName, $numberString)
+    private static function getStringInFile($fileName, $numberString)
     {
-        $file = file($fileName);
-        return $file[$numberString - 1];
+    	if (\file_exists($fileName))
+    	{
+	        $file = \file($fileName);
+	        return $file[$numberString - 1];
+    	}
+    	
+    	return '';
     }
     
-    private static function Report($methodName)
+    private static function report($methodName)
     {
         if (self::$debug) self::$methodName();
         self::Clear();
     }
     
-    private static function ReportWeb()
+    private static function reportWeb()
     {
     	$thisDir = '/Wings/Exception/';
         require \Wings::$dir . '/Exception/index.php';
         exit();
     }
     
-	public static function Shutdown()
+	public static function shutdown()
 	{
 		$error = \error_get_last();
 		
@@ -95,6 +100,6 @@ class Exception extends \Exception
 	}
 }
 
-\set_error_handler(\create_function('$errorNumber, $errorString, $errorFile, $errorLine, $errorContext', '\Wings\Exception::Error($errorNumber, $errorString, $errorFile, $errorLine, $errorContext);'), E_ALL);
-\set_exception_handler(\create_function('$exceptionHandler', '\Wings\Exception::Exception($exceptionHandler);'));
-\register_shutdown_function(\create_function('', '\Wings\Exception::Shutdown();'));
+\set_error_handler(\create_function('$errorNumber, $errorString, $errorFile, $errorLine, $errorContext', '\Wings\Exception::error($errorNumber, $errorString, $errorFile, $errorLine, $errorContext);'), E_ALL);
+\set_exception_handler(\create_function('$exceptionHandler', '\Wings\Exception::exception($exceptionHandler);'));
+\register_shutdown_function(\create_function('', '\Wings\Exception::shutdown();'));

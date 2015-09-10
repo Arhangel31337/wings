@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Project:     Wings: framework для собственных нужд
+ * Project:     Wings (framework)
  * File:        DB.php
  * 
  * Фреймворк разработанный для собственных нужд.
@@ -17,21 +17,24 @@
 
 namespace Wings;
 
-class DB
+final class DB
 {
-	private static $pdo = array();
-	public static $currentBase = 0;
+	public static	$currentBase		= 0;
+	private static	$pdo				= array();
+	
+	const			TRANSACTION_START	= true;
+	const			TRANSACTION_STOP	= false;
 	
 	/**
 	 * Удаления записи из таблицы
 	 *
 	 * @param string $table - наименование таблицы в БД
 	 * @param array $wheres - массив условий вида array('columnName' => 'condition')
-	 * @param array $args - массив подстановочных данных вида array(array('value', 'type', 'length'))
+	 * @param array $args - массив подстановочных данных вида array('name' => array('value', 'type', 'length'))
 	 *
 	 * @return PDOStatement - объект оператора
 	 */
-	public static function Delete($table, $wheres, $args)
+	public static function delete($table, $wheres, $args)
 	{
 		$where = array();
 		
@@ -40,9 +43,28 @@ class DB
 			$where[] = '`' . $key . '` ' . $value . ' :' . $key;
 		}
 		
-		$query = 'DELETE FROM `' . $table . '` WHERE ' . implode(' AND ', $where);
+		$query = 'DELETE FROM `' . $table . '` WHERE ' . implode(' AND ', $where) . ';';
 		
 		return self::Query($query, $args);
+	}
+	
+	public static function getEnumValues($table, $column)
+	{
+		$query = 'SHOW COLUMNS FROM `' . $table . '` LIKE \'' . $column . '\';';
+		
+		$result = self::fetchAll($query);
+		
+		if (!isset($result[0]['Type'])) return null;
+		
+		$matches = [];
+		
+		\preg_match_all('/enum\((\'.+\')\)/', $result[0]['Type'], $matches);
+		
+		if (!isset($matches[1][0])) return null;
+		
+		$result = mb_substr($matches[1][0], 1, (strlen($matches[1][0]) - 2));
+		
+		return explode('\',\'', $result);
 	}
 	
 	/**
@@ -52,25 +74,29 @@ class DB
 	 * 
 	 * @return void
 	 */
-	public static function Init($settings)
+	public static function init($settings)
 	{
 		try
 		{
 			if (isset($settings['type']))
 			{
+				$charsetQuery = 'SET character_set_connection = ' . $settings['charset'] . ";\n";
+				$charsetQuery .= 'SET character_set_client = ' . $settings['charset'] . ";\n";
+				$charsetQuery .='SET character_set_results = ' . $settings['charset'] . ";\n";
+				
 				self::$pdo[] = new \PDO($settings['type'] . ':host=' . $settings['host'] . ';dbname=' . $settings['name'], $settings['login'], $settings['password']);
-				self::$pdo[self::$currentBase]->query('SET character_set_connection = ' . $settings['charset'] . ';');
-				self::$pdo[self::$currentBase]->query('SET character_set_client = ' . $settings['charset'] . ';');
-				self::$pdo[self::$currentBase]->query('SET character_set_results = ' . $settings['charset'] . ';');
+				self::$pdo[self::$currentBase]->query($charsetQuery);
 			}
 			elseif (isset($settings[0]['type'])) 
 			{
 				foreach ($settings as $key => $value)
 				{
+					$charsetQuery = 'SET character_set_connection = ' . $value['charset'] . ";\n";
+					$charsetQuery .= 'SET character_set_client = ' . $value['charset'] . ";\n";
+					$charsetQuery .='SET character_set_results = ' . $value['charset'] . ";\n";
+					
 					self::$pdo[$key] = new \PDO($value['type'] . ':host=' . $value['host'] . ';dbname=' . $value['name'], $value['login'], $value['password']);
-					self::$pdo[$key]->query('SET character_set_connection = ' . $value['charset'] . ';');
-					self::$pdo[$key]->query('SET character_set_client = ' . $value['charset'] . ';');
-					self::$pdo[$key]->query('SET character_set_results = ' . $value['charset'] . ';');
+					self::$pdo[$key]->query($charsetQuery);
 				}
 			}
 			else throw new Exception('Нет настроек к базе данных');
@@ -85,11 +111,11 @@ class DB
 	 * Добавление записи в таблицу
 	 *
 	 * @param string $table - наименование таблицы в БД
-	 * @param array $args - массив подстановочных данных вида array(array('value', 'type', 'length'))
+	 * @param array $args - массив подстановочных данных вида array('name' => array('value', 'type', 'length'))
 	 *
-	 * @return PDOStatement - объект оператора
+	 * @return int - id вставленной строки
 	 */
-	public static function Insert($table, $args)
+	public static function insert($table, $args)
 	{
 		$keys = array_keys($args);
 		
@@ -109,7 +135,7 @@ class DB
 	 *
 	 * @return PDOStatement - объект оператора
 	 */
-	public static function FetchAll($query, $args = array(), $fetchType = 'assoc')
+	public static function fetchAll($query, $args = [], $fetchType = 'assoc')
 	{
 		$statement = self::Query($query, $args);
 		return $statement->FetchAll(self::FetchType($fetchType));
@@ -124,10 +150,31 @@ class DB
 	 *
 	 * @return PDOStatement - объект оператора
 	 */
-	public static function FetchColumn($query, $args, $column = 0)
+	public static function fetchColumn($query, $args = [], $column = 0)
 	{
 		$statement = self::Query($query, $args);
+		$result = [];
+		
+		while ($value = $statement->fetchColumn($column)) $result[] = $value;
+		
+		return $result;
+	}
+	
+	public static function fetchOne($query, $args = [], $column = 0)
+	{
+		$statement = self::Query($query, $args);
+		
+		if (!\is_numeric($column)) $column = 0;
+		
 		return $statement->fetchColumn($column);
+	}
+	
+	public static function fetchRow($query, $args = [], $row = 0, $fetchType = 'assoc')
+	{
+		$statement = self::Query($query, $args);
+		$statement = $statement->FetchAll(self::FetchType($fetchType));
+		if (\count($statement) === 0) return null;
+		if (is_numeric($row)) return $statement[$row];
 	}
 	
 	/**
@@ -137,7 +184,7 @@ class DB
 	 *
 	 * @return PDO::ATTR_FETCH_MODE - PDO::FETCH_* константа
 	 */
-	private static function FetchType($fetchType)
+	private static function fetchType($fetchType)
 	{
 		switch ($fetchType)
 		{
@@ -177,16 +224,17 @@ class DB
 	 * @param string $table - наименование таблицы в БД
 	 * @param string $select - наименование полей для выборки
 	 * @param array $wheres = null - массив условий вида array('columnName' => 'condition')
+	 * @param array $args - массив подстановочных данных вида array('name' => array('value', 'type', 'length'))
 	 * @param string $order = null - наименование полей для сортировки
-	 * @param array $args - массив подстановочных данных вида array(array('value', 'type', 'length'))
+	 * @param string $separator = 'AND' - разделитель между условиями
 	 *
-	 * @return PDOStatement - объект оператора
+	 * @return array массив результатов запроса
 	 */
-	public static function Select($table, $select, $wheres = null, $args = null, $order = null)
+	public static function select($table, $select = '*', $wheres = null, $args = null, $order = null, $limit = null, $separator = 'AND')
 	{
 		$query = 'SELECT ' . $select . ' FROM `' . $table . '`';
 		
-		if ($wheres !== null)
+		if (!\is_null($wheres))
 		{
 			$where = array();
 			
@@ -195,13 +243,20 @@ class DB
 				$where[] = '`' . $key . '` ' . $value . ' :' . $key;
 			}
 			
-			$query .= ' WHERE ' . implode(' AND ', $where);
+			$query .= ' WHERE ' . implode(' ' . $separator . ' ', $where);
 		}
 		
-		if ($order !== null)
+		if (!\is_null($order))
 		{
 			$query .= ' ORDER BY ' . $order;
 		}
+		
+		if (!\is_null($limit))
+		{
+			$query .= ' LIMIT ' . $limit;
+		}
+		
+		$query .= ';';
 		
 		return self::FetchAll($query, $args);
 	}
@@ -213,9 +268,14 @@ class DB
 	 *
 	 * @return void
 	 */
-	public static function Transaction($type = 'off')
+	public static function transaction($type = self::TRANSACTION_STOP)
 	{
-		if ($type === 'on') self::$pdo[self::$currentBase]->beginTransaction();
+		if ($type)
+		{
+			if (self::$pdo[self::$currentBase]->inTransaction()) self::$pdo[self::$currentBase]->commit();
+			
+			self::$pdo[self::$currentBase]->beginTransaction();
+		}
 		else self::$pdo[self::$currentBase]->commit();
 	}
 	
@@ -223,12 +283,13 @@ class DB
 	 * Выполнение запроса
 	 *
 	 * @param string $query - SQL-запрос
-	 * @param array $args - массив подстановочных данных вида array(array('value', 'type', 'length'))
+	 * @param array $args - массив подстановочных данных вида array('name' => array('value', 'type', 'length'))
 	 *
 	 * @return PDOStatement - объект оператора
 	 */
-	private static function Query($query, $args = array())
+	public static function query($query, $args = array())
 	{
+		//trace($query); trace($args);
 		$query = self::$pdo[self::$currentBase]->prepare($query);
 		
 		if (!empty($args))
@@ -248,12 +309,13 @@ class DB
 		
 		try
 		{
-			$query->execute();
+			if (!$query->execute()) throw new Exception($query->errorInfo()[2]);
 		}
 		catch (\PDOException $exception)
 		{
 			throw new \Exception($exception->getMessage());
 		}
+		$pdo = self::$pdo[self::$currentBase];
 		
 		return $query;
 	}
@@ -262,11 +324,11 @@ class DB
 	 * Обновление записи в таблице
 	 *
 	 * @param string $table - наименование таблицы в БД
-	 * @param array $args - массив подстановочных данных вида array(array('value', 'type', 'length'))
+	 * @param array $args - массив подстановочных данных вида array('name' => array('value', 'type', 'length'))
 	 *
 	 * @return PDOStatement - объект оператора
 	 */
-	public static function Update($table, $args)
+	public static function update($table, $args)
 	{
 		$keys = array_keys($args);
 		$last = count($keys) - 1;
@@ -278,7 +340,7 @@ class DB
 			$sets[] = '`' . $keys[$i] . '` = :' . $keys[$i];
 		}
 		
-		$query = 'UPDATE `' . $table . '` SET ' . implode(', ', $sets) . ' WHERE `' . $keys[$last] . '` = :' . $keys[$last];
+		$query = 'UPDATE `' . $table . '` SET ' . implode(', ', $sets) . ' WHERE `' . $keys[$last] . '` = :' . $keys[$last] . ';';
 		
 		return self::Query($query, $args);
 	}
@@ -290,7 +352,7 @@ class DB
 	 *
 	 * @return PDO::PARAM_INPUT_OUTPUT - PDO::PARAM_* константа
 	 */
-	private static function ValueParameters($value)
+	private static function valueParameters($value)
 	{
 		if (!isset($value[1])) $value[1] = gettype($value);
 		

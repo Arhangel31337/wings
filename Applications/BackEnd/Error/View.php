@@ -2,19 +2,17 @@
 
 namespace Applications\BackEnd\Error;
 
-class View
+final class View extends \Applications\BackEnd\View
 {
-	final public function __construct($error)
+	public function __construct()
 	{
-		\Wings::$view['tpl'] = 'default.tpl';
+		parent::__construct();
+	}
+	
+	public function index($errorCode, $errorMessage)
+	{
 		\Wings::$view['contentTPL'] = 'error.tpl';
-		\Wings::$view['error']['number'] = $error;
-		
-		switch ($error)
-		{
-			case 404:
-				\Wings::$view['error']['message'] = 'Страница не найдена.';
-				break;
-		}
+		\Wings::$view['error']['number'] = $errorCode;
+		\Wings::$view['error']['description'] = $errorMessage;
 	}
 }

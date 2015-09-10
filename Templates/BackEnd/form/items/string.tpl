@@ -1,0 +1,1 @@
+<input type="text" name="{$key}" value="{if isset($field.value)}{$field.value}{/if}" />

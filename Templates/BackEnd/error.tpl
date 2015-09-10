@@ -1,1 +1,2 @@
-<div class="page_error"><span>Ошибка {$error.number}{if isset($error.message)}:</span> {$error.message}{else}.</span>{/if}</div>
+<h1>Ошибка {$error.number}:</h1>
+<p>{$error.description}</p>

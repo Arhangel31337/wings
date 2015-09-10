@@ -1,0 +1,193 @@
+/*
+Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
+For licensing, see LICENSE.html or http://ckeditor.com/license
+*/
+
+body
+{
+	/* Font */
+	font-family: 'arial';
+	font-size: 12px;
+	font-style: normal;
+    font-weight: normal;
+
+	/* Text color */
+	color: #000000;
+
+	/* Remove the background color to make it transparent */
+	background-color: #fff;
+
+	margin: 20px;
+}
+
+.cke_editable
+{
+	font-size: 13px;
+	line-height: 1.6em;
+}
+
+blockquote
+{
+	font-style: italic;
+	font-family: Georgia, Times, "Times New Roman", serif;
+	padding: 2px 0;
+	border-style: solid;
+	border-color: #ccc;
+	border-width: 0;
+}
+
+.cke_contents_ltr blockquote
+{
+	padding-left: 20px;
+	padding-right: 8px;
+	border-left-width: 5px;
+}
+
+.cke_contents_rtl blockquote
+{
+	padding-left: 8px;
+	padding-right: 20px;
+	border-right-width: 5px;
+}
+
+a
+{
+	color: #0782C1;
+}
+
+ol,ul,dl
+{
+	/* IE7: reset rtl list margin. (#7334) */
+	*margin-right: 0px;
+	/* preserved spaces for list items with text direction other than the list. (#6249,#8049)*/
+	padding: 0 40px;
+}
+
+h1,h2,h3,h4,h5,h6
+{
+	font-weight: normal;
+	line-height: 1.2em;
+}
+
+hr
+{
+	border: 0px;
+	border-top: 1px solid #ccc;
+}
+
+img.right {
+    border: 1px solid #ccc;
+    float: right;
+    margin-left: 15px;
+    padding: 5px;
+}
+
+img.left {
+    border: 1px solid #ccc;
+    float: left;
+    margin-right: 15px;
+    padding: 5px;
+}
+
+img:hover {
+	opacity: .9;
+	filter: alpha(opacity = 90);
+}
+
+pre
+{
+	white-space: pre-wrap; /* CSS 2.1 */
+	word-wrap: break-word; /* IE7 */
+}
+
+.marker {
+    background-color: Yellow;
+}
+
+.cl-b {
+	clear: both;
+}
+
+.file {
+	clear: both;
+	height: 75px;
+	margin-bottom: 10px;
+}
+
+.file .icon {
+	background-image: url("/images/icons-small.png");
+    background-position: 0 -480px;
+    background-repeat: no-repeat;
+	float: left;
+    height: 60px;
+    width: 60px;
+}
+
+.file .name {
+	float: left;
+    margin-left: 20px;
+	margin-top: 18px;
+}
+
+.file .name a {
+	color: #004682;
+}
+
+.file .size {
+	float: right;
+    margin-left: 15px;
+	margin-top: 18px;
+    text-align: right;
+}
+
+.file .date {
+	float: right;
+	margin-top: 18px;
+}
+
+.file .icon.image_vnd_adobe_photoshop {
+	background-position: 0 0;
+}
+
+.file .icon.image_png {
+    background-position: -120px -420px;
+}
+
+.file .icon.image_jpeg {
+    background-position: -60px -420px;
+}
+
+.file .icon.text_plain {
+    background-position: 0 -360px;
+}
+
+.file .icon.video_x-ms-wmv,
+.file .icon.video_x-ms-asf {
+	background-position: -180px -300px;
+}
+
+.file .icon.application_msword {
+    background-position: -60px -180px;
+}
+
+
+.file .icon.application_pdf {
+    background-position: -60px 0;
+}
+
+.file .icon.application_zip,
+.file .icon.application_x-zip-compressed {
+    background-position: -240px -360px;
+}
+
+.file .icon.video_x-msvideo {
+	background-position: -60px -300px;
+}
+
+.file .icon.application_x-rar {
+	background-position: -180px -360px;
+}
+
+.file .icon.application_vnd_ms-excel {
+	background-position: -240px -60px;
+}

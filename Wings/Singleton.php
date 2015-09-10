@@ -16,7 +16,7 @@ class Singleton
 		
 	}
 	
-	final public static function Instance()
+	final public static function instance()
 	{
 		$class = \get_called_class();
 		
@@ -24,3 +24,5 @@ class Singleton
 		return self::$instance[$class];
 	}
 }
+
+?>

@@ -1,0 +1,1 @@
+{include file="table.tpl" table=$users}
