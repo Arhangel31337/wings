@@ -4,6 +4,7 @@ namespace Applications\BackEnd;
 
 class Controller
 {
+	protected $model;
 	protected $view;
 	
 	public function __construct()

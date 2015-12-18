@@ -114,6 +114,7 @@ final class NestedSets implements iTree
 	public static function selectAll($table, $select = '*', $addJoin = '', $addArgs = [])
 	{
 		$query = 'SELECT ';
+		
 		if ($select === '*') $query .= $select;
 		else $query .= '`' . $table . '`.`level`, ' . $select;
 		

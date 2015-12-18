@@ -10,9 +10,13 @@ final class Workspace
 	{
 		if (\Wings::$user->getIsActive() != 1)
 		{
-			$result['mvc'] = \Wings::$workspace['namespace'] . 'Authorization\Controller';
+			$result['mvc'] = \Wings::$workspace['namespace'] . 'Authorization';
 			$mvc = new $result['mvc']();
-			return $mvc->index();
+			$method = 'index';
+			
+			if (isset(\Wings::$pathname[1]) && \Wings::$pathname[0] === 'authorization') $method = \Wings::$pathname[1];
+			
+			return $mvc->$method();
 		}
 		
 		$pathCount = \count(\Wings::$pathname) - 1;
@@ -42,14 +46,14 @@ final class Workspace
 		
 		if (isset($result['access']['select']) && !$result['access']['select'])
 		{
-			$result['mvc'] = 'Error';
+			$result['mvc'] = 'ErrorController';
 			$result['method'] = 'index';
 			$result['args'] = 403;
 		}
 		
 		if (\is_null($result) || !isset($result['mvc']))
 		{
-			$result['mvc'] = 'Error';
+			$result['mvc'] = 'ErrorController';
 			$result['method'] = 'index';
 			$result['args'] = 404;
 		}
@@ -60,7 +64,7 @@ final class Workspace
 			$result['args'] = $args;
 		}
 		
-		$result['mvc'] = \Wings::$workspace['namespace'] . $result['mvc'] . '\Controller';
+		$result['mvc'] = \Wings::$workspace['namespace'] . $result['mvc'];
 		
 		if (!isset($result['method']) || is_null($result['method'])) $result['method'] = 'index';
 		

@@ -2,79 +2,55 @@
 <html>
 {include file="head.tpl"}
 <body>
-	<div class="loader-bg">
-		<div class="loader"></div>
-	</div>
-	<div class="main">
+	<aside>
 		<header>
-			<div class="menu">
-				<div class="main-wrapper">
-					<a href="/ru-ru/admin/">
-						<div class="logo fl-l"></div>
-					</a>
-					<div class="fl-r">
-						<form action="?logout" method="post">
-							<input type="submit" name="logout" value="Выйти" placeholder="Выйти" tabindex="0" />
-						</form>
-					</div>
-{if isset($navigation)}
-					<nav>
-						<ul>
-	{foreach from=$navigation item=item}
-							<li><a href="/{$language.code}/{$workspace.url}/{$item.url}" menu="{$item.alias}">{$item.name}</a></li>
-	{/foreach}
-						</ul>
-					</nav>
-{/if}
-					<div class="cl-b"></div>
+			<a class="logo" href="#">Wings</a>
+			<div class="user">
+				<div class="select">
+					<div class="name">Arhangel31337</div>
+					<div class="arrow"></div>
 				</div>
+				<ul>
+					<li>
+						<a class="icon settings" href="#">Настройки</a>
+					</li>
+					<li>
+						<a class="icon exit" href="?logout">Выход</a>
+					</li>
+				</ul>
 			</div>
-{if isset($navigation)}
-			<div class="subMenu">
-				<nav class="main-wrapper">
-	{foreach from=$navigation item=item}
-					<ul menu="{$item.alias}">
-		{if isset($item.childrens)}
-			{foreach from=$item.childrens item=subItem}
-				{if isset($page.id) && $subItem.id === $page.id}
-						<li class="active">{$subItem.name}</li>
-				{else}
-						<li><a href="/{$language.code}/{$workspace.url}/{$subItem.url}">{$subItem.name}</a></li>
-				{/if}
-			{/foreach}
-		{/if}
-					</ul>
-	{/foreach}
-					<div class="cl-b"></div>
-				</nav>
-			</div>
-{/if}
 		</header>
-		<div>
-			<div class="main-wrapper">
-{if isset($breadcrumbs)}
-				<div class="breadcrumbs">
-	{foreach from=$breadcrumbs item=item}
-					<a href="/{$language.code}/{$workspace.url}/{$item.url}">{$item.name}</a>
-		{if !isset($page.id) || $item.id !== $page.id}
-					<span>/</span>
-		{/if}
-	{/foreach}
-				</div>
-{/if}
-				<div class="content">
-{if isset($page.name)}
-					<h1>{$page.name}</h1>
-{/if}
-{if isset($contentTPL)}
-	{include file=$contentTPL}
-{/if}
-				</div>
+		<nav>
+{include file="menu.tpl" nodes=$pages.0.childrens}
+		</nav>
+	</aside>
+	<section>
+		<article class="page1">
+			<div class="background">
+			<div class="cssload-loader progress blockInCenter">
+				<div class="cssload-inner cssload-one"></div>
+				<div class="cssload-inner cssload-two"></div>
+				<div class="cssload-inner cssload-three"></div>
 			</div>
+			<div class="cl-b"></div>
 		</div>
-		<footer>
-			<div class="copyright">© 2015 Arhangel31337</div>
-		</footer>
-	</div>
+		</article>
+		<article class="page2">
+			<div class="cssload-loader progress blockInCenter">
+				<div class="cssload-inner cssload-one"></div>
+				<div class="cssload-inner cssload-two"></div>
+				<div class="cssload-inner cssload-three"></div>
+			</div>
+			<div class="cl-b"></div>
+		</article>
+		<article class="page3">
+			<div class="cssload-loader progress blockInCenter">
+				<div class="cssload-inner cssload-one"></div>
+				<div class="cssload-inner cssload-two"></div>
+				<div class="cssload-inner cssload-three"></div>
+			</div>
+			<div class="cl-b"></div>
+		</article>
+	</section>
 </body>
 </html>
