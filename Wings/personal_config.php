@@ -9,7 +9,7 @@ return
 			'host'		=> 'localhost',
 			'name'		=> 'wings',
 			'login'		=> 'root',
-			'password'	=> '14a86r35h',
+			'password'	=> '',
 			'charset'	=> 'UTF8'
 		]
 	],

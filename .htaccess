@@ -1,10 +1,10 @@
-ExpiresActive On
-ExpiresByType image/gif "access plus 1 months"
-ExpiresByType image/jpeg "access plus 1 months"
-ExpiresByType image/png "access plus 1 months"
-ExpiresByType text/css "access plus 1 months"
-ExpiresByType text/javascript "access plus 1 months"
-ExpiresByType application/javascript "access plus 1 months"
+#ExpiresActive On
+#ExpiresByType image/gif "access plus 1 months"
+#ExpiresByType image/jpeg "access plus 1 months"
+#ExpiresByType image/png "access plus 1 months"
+#ExpiresByType text/css "access plus 1 months"
+#ExpiresByType text/javascript "access plus 1 months"
+#ExpiresByType application/javascript "access plus 1 months"
 
 AddOutputFilterByType DEFLATE text/html
 AddOutputFilterByType DEFLATE text/plain

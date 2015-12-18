@@ -1,5 +1,23 @@
 var articlesAreaWidth = 0;
 var asideWidth = 256;
+var pages =
+[
+	{
+		args	: {},
+		method	: '',
+		model	: ''
+	},
+	{
+		args	: {},
+		method	: '',
+		model	: ''
+	},
+	{
+		args	: {},
+		method	: '',
+		model	: ''
+	}
+];
 var windowHeight = 0;
 var windowWidth = 0;
 
@@ -23,13 +41,29 @@ $(document).ready(function() {
 				ul.show(500);
 			}
 			else ul.hide(500);
-			
-			return false;
 		}
 		else
 		{
+			var page = $(this).attr('page');
 			
+			if (page !== undefined)
+			{
+				page = page.split(';');
+				
+				if (page.length === 3)
+				{
+					pages[(page[0] - 1)] =
+					{
+						method	: page[2],
+						model	: page[1]
+					};
+					
+					updatePages(page[0])
+				}
+			}
 		}
+		
+		return false;
 	});
 });
 
@@ -41,7 +75,8 @@ $(window).resize(function() {
 	resize();
 });
 
-function resize() {
+function resize()
+{
 	windowHeight = $(window).height();
 	windowWidth = $(window).width();
 	
@@ -49,4 +84,46 @@ function resize() {
 	
 	$('body > section').width(windowWidth);
 	$('article.page1').width(articlesAreaWidth);
+};
+
+function updatePages(page)
+{
+	if (page === undefined) page = 0;
+	
+	for (var i = 0; i < pages.length; i++)
+	{
+		if (pages[i].model === '' || pages[i].method === '') continue;
+		
+		$.ajax({
+			url			: '/ru-ru/admin/' + pages[i].model + '/' + pages[i].method + '/',
+			dataType	: "json",
+			data		: pages[i].args,
+			method		: 'POST',
+			success		: function(json)
+			{
+				if (json.code !== undefined)
+				{
+					if (json.code === 200)
+					{
+						switch(json.dataType)
+						{
+							case 'table':
+								
+								break;
+						}
+					}
+					else
+					{
+						
+					}
+				}
+				
+				$('.background').css('display', 'none');
+			},
+			error		: function(jqXHR, textStatus, errorThrown)
+			{
+				
+			}
+		});
+	}
 };

@@ -1,1 +1,0 @@
-<input type="password" name="{$key}" value="{if isset($field.value)}{$field.value}{/if}" />
