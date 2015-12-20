@@ -1,10 +1,10 @@
 <?php
 
-namespace Applications\BackEnd;
+namespace Applications\Ajax;
 
 final class Group extends Controller
 {
-	function __construct ()
+	function __construct()
 	{
 		$this->model = new \Applications\Models\Group();
 		
@@ -57,7 +57,7 @@ final class Group extends Controller
 		$this->view->change($group);
 	}
 	
-	public function list()
+	public function index()
 	{
 		$groups = $this->model->getAll();
 		
@@ -68,7 +68,8 @@ final class Group extends Controller
 			'items'		=> $groups
 		];
 		
-		$this->view->tree($groups);
+		return \Applications\Ajax\Controller::json($groups);
+		//$this->view->tree($groups);
 	}
 	
 	public function item($id)

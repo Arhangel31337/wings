@@ -2,9 +2,24 @@
 
 namespace Applications\Ajax;
 
-final class Controller
+class Controller
 {
-	private static $view;
+	protected $model;
+	protected static $view;
+	
+	protected static function checkAccess($accesses, $type)
+	{
+		if ($accesses[$type] === 0)
+		{
+			return
+			[
+				'code'			=> 403,
+				'description'	=> 'Доступ запрещён.'
+			];
+		}
+		
+		return true;
+	}
 	
 	public static function csv($data)
 	{
@@ -22,6 +37,20 @@ final class Controller
 		}
 		
 		self::$view->json(\implode("\n", $strings));
+	}
+	
+	public function issetAllData($columns)
+	{
+		foreach ($columns as $key => $value)
+		{
+			if (isset($value['generated']) && $value['generated'] === true && !isset($field['field']['isConfirm'])) continue;
+			if ($value['field']['type'] === 'checkbox') continue;
+			
+			if (isset(\Wings::$post[$key])) continue;
+			else return false;
+		}
+		
+		return true;
 	}
 	
 	public static function html($file, $data)

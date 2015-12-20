@@ -1,6 +1,6 @@
 /*
- * Primary color	- #2196F3
- * Accent color		- #FF5252
+ * Primary color	- #2196F3	- 33, 150, 243
+ * Accent color		- #FF5252	- 255, 82, 82
 */
 
 /*
@@ -20,10 +20,6 @@ html {
 }
 
 body {
-	font-family: "Roboto";
-	font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
 	height: 100%;
 	min-height: 100%;
 	overflow-y: scroll;
@@ -43,6 +39,12 @@ form {
 	overflow: hidden;
 }
 
+h2 {
+	font-size: 24px;
+	font-weight: 700;
+	margin-bottom: 16px;
+}
+
 h3 {
 	font-size: 20px;
 	font-weight: 500;
@@ -57,8 +59,6 @@ input[type=submit] {
 	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
 	color: #FFFFFF;
 	cursor: pointer;
-	font-size: 14px;
-	font-weight: 500;
 	margin: 0px 2px 4px;
 	padding: 8px 16px;
 	text-transform: uppercase;
@@ -383,6 +383,40 @@ input[type=password]:focus {
 	margin-right: 20px;
 }
 
+.checkbox {
+	background: transparent url("/images/BackEnd/elements/check_off.png") no-repeat scroll 0px 0px;
+	padding-left: 24px;
+}
+
+.checkbox.checked {
+	background: transparent url("/images/BackEnd/elements/check_on.png") no-repeat scroll 0px 0px;
+}
+
+.checkbox input {
+	display: none;
+}
+
+.popup {
+	background-color: rgba(0, 0, 0, 0.1);
+	display: none;
+	height: 100%;
+	position: absolute;
+	width: 100%;
+	z-index: 20000;
+}
+
+.popup section {
+	background-color: #FFFFFF;
+	box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.3);
+	border-radius: 2px;
+	width: 400px;
+	padding: 16px;
+}
+
+.popup section article {
+	margin-bottom: 16px;
+}
+
 aside {
 	float: left;
 	height: 100%;
@@ -400,115 +434,187 @@ aside .icon {
 	padding-top: 10px;
 }
 
-aside .icon.bots {
+.icon.add {
+	background-image: url("/images/backend/icons/add.png");
+}
+
+.icon.add.active {
+	background-image: url("/images/backend/icons/add_active.png");
+}
+
+.icon.back {
+	background-image: url("/images/backend/icons/back.png");
+}
+
+.icon.back.active {
+	background-image: url("/images/backend/icons/back_active.png");
+}
+
+.icon.bots {
 	background-image: url("/images/backend/icons/bots.png");
 }
 
-aside .icon.bots.active {
+.icon.bots.active {
 	background-image: url("/images/backend/icons/bots_active.png");
 }
 
-aside .icon.content {
+.icon.content {
 	background-image: url("/images/backend/icons/content.png");
 }
 
-aside .icon.content.active {
+.icon.content.active {
 	background-image: url("/images/backend/icons/content_active.png");
 }
 
-aside .icon.exit {
+.icon.create {
+	background-image: url("/images/backend/icons/create.png");
+}
+
+.icon.create.active {
+	background-image: url("/images/backend/icons/create_active.png");
+}
+
+.icon.down {
+	background-image: url("/images/backend/icons/down.png");
+}
+
+.icon.down.active {
+	background-image: url("/images/backend/icons/down_active.png");
+}
+
+.icon.exit {
 	background-image: url("/images/backend/icons/exit.png");
 }
 
-aside .icon.exit.active {
+.icon.exit.active {
 	background-image: url("/images/backend/icons/exit_active.png");
 }
 
-aside .icon.files {
+.icon.files {
 	background-image: url("/images/backend/icons/files.png");
 }
 
-aside .icon.files.active {
+.icon.files.active {
 	background-image: url("/images/backend/icons/files_active.png");
 }
 
-aside .icon.groups {
+.icon.filter {
+	background-image: url("/images/backend/icons/filter.png");
+}
+
+.icon.filter.active {
+	background-image: url("/images/backend/icons/filter_active.png");
+}
+
+.icon.groups {
 	background-image: url("/images/backend/icons/groups.png");
 }
 
-aside .icon.groups.active {
+.icon.groups.active {
 	background-image: url("/images/backend/icons/groups_active.png");
 }
 
-aside .icon.languages {
+.icon.languages {
 	background-image: url("/images/backend/icons/languages.png");
 }
 
-aside .icon.languages.active {
+.icon.languages.active {
 	background-image: url("/images/backend/icons/languages_active.png");
 }
 
-aside .icon.modules {
+.icon.modules {
 	background-image: url("/images/backend/icons/modules.png");
 }
 
-aside .icon.modules.active {
+.icon.modules.active {
 	background-image: url("/images/backend/icons/modules_active.png");
 }
 
-aside .icon.pages {
+.icon.pages {
 	background-image: url("/images/backend/icons/pages.png");
 }
 
-aside .icon.pages.active {
+.icon.pages.active {
 	background-image: url("/images/backend/icons/pages_active.png");
 }
 
-aside .icon.settings {
+.icon.remove {
+	background-image: url("/images/backend/icons/remove.png");
+}
+
+.icon.remove.active {
+	background-image: url("/images/backend/icons/remove_active.png");
+}
+
+.icon.save {
+	background-image: url("/images/backend/icons/save.png");
+}
+
+.icon.save.active {
+	background-image: url("/images/backend/icons/save_active.png");
+}
+
+.icon.settings {
 	background-image: url("/images/backend/icons/settings.png");
 }
 
-aside .icon.settings.active {
+.icon.settings.active {
 	background-image: url("/images/backend/icons/settings_active.png");
 }
 
-aside .icon.shop {
+.icon.shop {
 	background-image: url("/images/backend/icons/shop.png");
 }
 
-aside .icon.shop.active {
+.icon.shop.active {
 	background-image: url("/images/backend/icons/shop_active.png");
 }
 
-aside .icon.statistics {
-	background-image: url("/images/backend/icons/statistics.png");
+.icon.statistic {
+	background-image: url("/images/backend/icons/statistic.png");
 }
 
-aside .icon.statistics.active {
-	background-image: url("/images/backend/icons/statistics_active.png");
+.icon.statistic.active {
+	background-image: url("/images/backend/icons/statistic_active.png");
 }
 
-aside .icon.transfers {
+.icon.transfers {
 	background-image: url("/images/backend/icons/transfers.png");
 }
 
-aside .icon.transfers.active {
+.icon.transfers.active {
 	background-image: url("/images/backend/icons/transfers_active.png");
 }
 
-aside .icon.users {
+.icon.up {
+	background-image: url("/images/backend/icons/up.png");
+}
+
+.icon.up.active {
+	background-image: url("/images/backend/icons/up_active.png");
+}
+
+.icon.update {
+	background-image: url("/images/backend/icons/update.png");
+}
+
+.icon.update.active {
+	background-image: url("/images/backend/icons/update_active.png");
+}
+
+.icon.users {
 	background-image: url("/images/backend/icons/users.png");
 }
 
-aside .icon.users.active {
+.icon.users.active {
 	background-image: url("/images/backend/icons/users_active.png");
 }
 
-aside .icon.visits {
+.icon.visits {
 	background-image: url("/images/backend/icons/visits.png");
 }
 
-aside .icon.visits.active {
+.icon.visits.active {
 	background-image: url("/images/backend/icons/visits_active.png");
 }
 
@@ -595,10 +701,12 @@ body > section {
 	overflow: hidden;
 }
 
-article {
+body > section > article {
+	background-color: #FFFFFF;
 	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
 	height: 100%;
-	margin-left: 101%;
+	margin-left: 110%;
+	overflow: auto;
 	padding: 16px;
 	position: absolute;
 }
@@ -616,15 +724,98 @@ article.page3 {
 	z-index: 300;
 }
 
+section > article > section {
+	margin: 0 -16px;
+}
 
+section > article > section h2 {
+	margin-left: 16px;
+}
 
+section > article > section .menu {
+	margin-right: 16px;
+}
 
+section > article > section .menu .icon {
+	background-position: 0px 12px;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	height: 48px;
+	padding-left: 32px;
+	padding-top: 10px;
+}
 
+section > article > section .menu .icon:hover {
+	color: #2196F3;
+}
 
+section > article > section .menu .icon.fl-l {
+	margin-left: 16px;
+	margin-right: 32px;
+}
 
+section > article > section .menu .icon.fl-r {
+	margin-left: 32px;
+}
 
+section > article > section .filters {
+	display: none;
+	margin-left: 16px;
+}
 
+section > article > section .filters div {
+	height: 48px;
+	width: 400px;
+}
 
+table {
+	width: 100%;
+}
+
+table tr {
+	border-top: 1px solid #E3E3E3;
+	cursor: pointer;
+	height: 48px;
+}
+
+table thead tr {
+	border-top: none;
+}
+
+table tbody tr.selected,
+table tbody tr.checked {
+	background-color: rgba(33, 150, 243, 0.1);
+}
+
+table tbody tr:hover {
+	background-color: #E3F2FD;
+}
+
+table th {
+	color: rgba(0, 0, 0, 0.26);
+}
+
+table th,
+table td {
+	padding: 10px 16px 0px;
+	text-align: center;
+}
+
+table th .icon {
+	float: left;
+	height: 24px;
+	margin-right: 8px;
+	margin-top: 2px;
+	width: 24px;
+}
+
+form {
+	padding: 0px 16px;
+}
+
+form div {
+	height: 48px;
+}
 
 
 

@@ -10,10 +10,8 @@ class Controller
 	public function __construct()
 	{
 		$menuTree = \Wings\Page::selectAllAvailable();
-		$breadcrumbs = \Wings\Page::selectParents(\Wings::$page['id']);
 		
 		View::setNavigation($menuTree[0]['childrens']);
-		View::setBreadcrumbs($breadcrumbs);
 	}
 	
 	public function backToItem()
@@ -33,20 +31,6 @@ class Controller
 		$url = implode('/', $url);
 		
 		\Wings\Header::setLocation($url);
-	}
-	
-	public function issetAllData($columns)
-	{
-		foreach ($columns as $key => $value)
-		{
-			if (isset($value['generated']) && $value['generated'] === true && !isset($field['field']['isConfirm'])) continue;
-			if ($value['field']['type'] === 'checkbox') continue;
-			
-			if (isset(\Wings::$post[$key])) continue;
-			else return false;
-		}
-		
-		return true;
 	}
 	
 	public function move($id)

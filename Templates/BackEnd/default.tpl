@@ -2,6 +2,14 @@
 <html>
 {include file="head.tpl"}
 <body>
+	<div class="popup">
+		<section class="blockInCenter">
+			<h3></h3>
+			<article></article>
+			<input class="fl-r" type="button" value="" />
+			<div class="cl-b"></div>
+		</section>
+	</div>
 	<aside>
 		<header>
 			<a class="logo" href="#">Wings</a>
@@ -25,31 +33,38 @@
 		</nav>
 	</aside>
 	<section>
-		<article class="page1">
+		<article class="page1" page="1">
 			<div class="background">
-			<div class="cssload-loader progress blockInCenter">
-				<div class="cssload-inner cssload-one"></div>
-				<div class="cssload-inner cssload-two"></div>
-				<div class="cssload-inner cssload-three"></div>
+				<div class="cssload-loader progress blockInCenter">
+					<div class="cssload-inner cssload-one"></div>
+					<div class="cssload-inner cssload-two"></div>
+					<div class="cssload-inner cssload-three"></div>
+				</div>
+				<div class="cl-b"></div>
 			</div>
-			<div class="cl-b"></div>
-		</div>
+			<section></section>
 		</article>
-		<article class="page2">
-			<div class="cssload-loader progress blockInCenter">
-				<div class="cssload-inner cssload-one"></div>
-				<div class="cssload-inner cssload-two"></div>
-				<div class="cssload-inner cssload-three"></div>
+		<article class="page2" page="2">
+			<div class="background">
+				<div class="cssload-loader progress blockInCenter">
+					<div class="cssload-inner cssload-one"></div>
+					<div class="cssload-inner cssload-two"></div>
+					<div class="cssload-inner cssload-three"></div>
+				</div>
+				<div class="cl-b"></div>
 			</div>
-			<div class="cl-b"></div>
+			<section></section>
 		</article>
-		<article class="page3">
-			<div class="cssload-loader progress blockInCenter">
-				<div class="cssload-inner cssload-one"></div>
-				<div class="cssload-inner cssload-two"></div>
-				<div class="cssload-inner cssload-three"></div>
+		<article class="page3" page="3">
+			<div class="background">
+				<div class="cssload-loader progress blockInCenter">
+					<div class="cssload-inner cssload-one"></div>
+					<div class="cssload-inner cssload-two"></div>
+					<div class="cssload-inner cssload-three"></div>
+				</div>
+				<div class="cl-b"></div>
 			</div>
-			<div class="cl-b"></div>
+			<section></section>
 		</article>
 	</section>
 </body>

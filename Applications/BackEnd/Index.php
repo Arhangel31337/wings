@@ -4,9 +4,7 @@ namespace Applications\BackEnd;
 
 final class Index extends Controller
 {
-	function __construct () {}
-	
-	public function index()
+	function __construct ()
 	{
 		$this->view = new View();
 		

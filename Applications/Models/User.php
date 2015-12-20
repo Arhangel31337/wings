@@ -18,11 +18,7 @@ final class User extends Model
 			'default'	=> 'now',
 			'field'		=> ['type'	=> 'string'],
 			'generated'	=> true,
-			'style'		=>
-			[
-				'align'	=> 'center',
-				'nowrap'=> true
-			],
+			'style'		=> ['align'	=> 'center'],
 			'type'		=> ['str', 19]
 		],
 		'lastVisit'	=>
@@ -30,22 +26,14 @@ final class User extends Model
 			'default'	=> 'now',
 			'field'		=> ['type'	=> 'string'],
 			'generated'	=> true,
-			'style'		=>
-			[
-				'align'		=> 'center',
-				'nowrap'	=> true
-			],
+			'style'		=> ['align'	=> 'center'],
 			'type'		=> ['str', 19]
 		],
 		'login'	=>
 		[
 			'field'		=> ['type'	=> 'string'],
 			'link'		=> true,
-			'style'		=>
-			[
-				'align'		=> 'center',
-				'main'		=> true
-			],
+			'style'		=> ['align'	=> 'center'],
 			'type'		=> ['str', 31],
 			'validate'	=> ['required']
 		],

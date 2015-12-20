@@ -9,6 +9,7 @@ abstract class Model
 	public		$multilang	= [];
 	public		$table		= '';
 	public		$tree		= '';
+	public		$type		= 'list';
 	public		$words		= [];
 	
 	public function delete($id)
@@ -288,6 +289,8 @@ abstract class Model
 				}
 			}
 		}
+		
+		return $id;
 	}
 	
 	public function move($nodeID, $parentID, $nearNodeID)

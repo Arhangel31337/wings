@@ -4,7 +4,7 @@ namespace Wings;
 
 final class Page
 {
-	public static function getAccess($pageID, $userID = null)
+	public static function getPageAccess($pageID, $userID = null)
 	{
 		if (\is_null($userID)) $userID = \Wings::$user->getId();
 		
@@ -45,32 +45,6 @@ final class Page
 		else return $result[0];
 	}
 	
-	public static function getAccesses($pageID, $langID = null)
-	{
-		if (\is_null($langID)) $langID = \Wings::$language['id'];
-		
-		$query = '
-			SELECT 
-				pa.*,
-				CASE WHEN pa.`type` = 1 THEN lgr.`name` ELSE us.`login` END AS `name`
-			FROM `access_Pages` pa
-			LEFT OUTER JOIN `lang_Groups` lgr ON pa.`groupID` = lgr.`groupID` AND lgr.`langID` = :langID
-			LEFT OUTER JOIN `Users` us ON pa.`userID` = us.`id`
-			WHERE
-				pa.`pageID` = :pageID AND
-				(pa.`type` = 1 AND lgr.`langID` IS NOT NULL OR
-				pa.`type` = 0 AND lgr.`langID` IS NULL)
-			ORDER BY pa.`type` DESC;
-		';
-		
-		$args = [
-			'pageID'	=> [$pageID, 'int', 11],
-			'langID'	=> [$langID, 'int', 3]
-		];
-		
-		return \Wings\DB::fetchAll($query, $args);
-	}
-	
 	public static function getPageMVC($host, $workspace, $pageURL)
 	{
 		$query = '
@@ -108,6 +82,37 @@ final class Page
 		else return null;
 	}
 	
+	public static function getPageTypeAccess($pageType, $userID = null)
+	{
+		if (\is_null($userID)) $userID = \Wings::$user->getId();
+		
+		$query = '
+			SELECT
+				pt.`id`,
+				MAX(pta.`select`) AS `select`,
+				MAX(pta.`insert`) AS `insert`,
+				MAX(pta.`update`) AS `update`,
+				MAX(pta.`delete`) AS `delete`
+			FROM
+				`PageType` pt
+			INNER JOIN `access_PageType` pta ON pt.`id` = pta.`pageType`
+			LEFT OUTER JOIN `link_UserGroup` lgrus ON pta.`group` = lgrus.`group`
+			WHERE
+				pt.`mvc` = :pageType AND
+				(pta.`user` = :userID OR lgrus.`user` = :userID)
+			GROUP BY pta.`pageType`;
+		';
+		$args =
+		[
+			'pageType' => array($pageType, 'int', 11),
+			'userID' => array($userID, 'int', 11)
+		];
+		$result = \Wings\DB::FetchAll($query, $args);
+		
+		if (\count($result) === 0) return false;
+		else return $result[0];
+	}
+	
 	public static function selectAllAvailable($userID = null, $langID = null, $onlyVisible = true, $onlyDeleted = false)
 	{
 		if (\is_null($userID)) $userID = \Wings::$user->getId();
@@ -121,6 +126,7 @@ final class Page
 				MAX(pa.`insert`) AS `insert`,
 				MAX(pa.`update`) AS `update`,
 				MAX(pa.`delete`) AS `delete`,
+				pt.`mvc`,
 				lp.`name`,
 				lp.`title`,
 				lp.`keywords`,

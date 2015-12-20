@@ -35,8 +35,8 @@
 	
     {if isset($page.pageTitle)}<title>{$page.pageTitle}</title>{/if}
 	
+	<link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="/css/backend/reset.css" />
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:Regular,Medium" />
     <link rel="stylesheet" type="text/css" href="/css/backend/style.css" />
 	
 {foreach from=$files.css item=css}
@@ -56,6 +56,7 @@
 	<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
 	
 	<script type="text/javascript" src="/js/BackEnd/functions.js"></script>
+	<script type="text/javascript" src="/js/BackEnd/elements.js"></script>
 	
 {foreach from=$files.js item=js}
 	<script {if $js.async}async {/if}type="text/javascript" src="{$js.src}"></script>

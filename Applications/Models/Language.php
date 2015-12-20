@@ -10,40 +10,31 @@ final class Language extends Model
 		[
 			'field'		=> ['type'	=> 'label'],
 			'generated'	=> true,
-			'style'		=> ['align'	=> 'center'],
+			'turn'		=> 1,
 			'type'		=> ['int', 3]
 		],
 		'name'	=>
 		[
 			'field'		=> ['type'	=> 'string'],
 			'link'		=> true,
-			'style'		=>
-			[
-				'align'		=> 'center',
-				'main'		=> true
-			],
+			'style'		=> ['align'	=> 'left'],
+			'turn'		=> 2,
 			'type'		=> ['str', 5],
 			'validate'	=> ['required']
 		],
 		'nameEn'	=>
 		[
 			'field'		=> ['type'	=> 'string'],
-			'style'		=>
-			[
-				'align'		=> 'center',
-				'main'		=> true
-			],
+			'style'		=> ['align'	=> 'left'],
+			'turn'		=> 3,
 			'type'		=> ['str', 63],
 			'validate'	=> ['required']
 		],
 		'code'	=>
 		[
 			'field'		=> ['type'	=> 'string'],
-			'style'		=>
-			[
-				'align'		=> 'center',
-				'main'		=> true
-			],
+			'style'		=> ['align'	=> 'left'],
+			'turn'		=> 4,
 			'type'		=> ['str', 63],
 			'validate'	=> ['required']
 		]
