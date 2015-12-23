@@ -43,28 +43,4 @@ class Controller
 		
 		return $ajax->json(['code' => 200]);
 	}
-	
-	public function validate($fields)
-	{
-		foreach ($fields as $key => $field)
-		{
-			if (!isset($field['validate']) && !isset($field['field']['isConfirm'])) continue;
-			
-			if (isset($field['validate']))
-			{
-				foreach ($field['validate'] as $value)
-				{
-					if ($value === 'checked' && !isset(\Wings::$post[$key])) return false;
-					if (!\Wings\Validation::$value(\Wings::$post[$key])) return false;
-				}
-			}
-			
-			if (isset($field['field']['isConfirm']))
-			{
-				if (\Wings::$post[$key] !== \Wings::$post[$field['field']['fieldKey']]) return false;
-			}
-		}
-	
-		return true;
-	}
 }

@@ -7,7 +7,7 @@ final class Language extends Controller
 	public function __construct()
 	{
 		$this->model = new \Applications\Models\Language();
-		
+		$this->model->model = $this->model;
 		$this->model->setWords();
 	}
 	
@@ -17,15 +17,16 @@ final class Language extends Controller
 		
 		if ($access !== true) return self::json($access);
 		
-		if ($this->issetAllData($this->model->columns) && $this->validate($this->model->columns))
+		$model = $this->model;
+		
+		if ($this->issetAllData($model::$columns) && $this->validate($model::$columns))
 		{
-			$id = $this->model->insert($this->model->columns, $data);
+			$id = $this->model->insert($model::$columns, $data);
 			
-			return
-			[
+			return self::json([
 				'code'			=> 200,
 				'description'	=> $id
-			];
+			]);
 		}
 		
 		$language = $this->model->prepareModel();
@@ -35,34 +36,13 @@ final class Language extends Controller
 			'code'	=> 200,
 			'data'	=>
 			[
-				'columns'	=> $this->model->columns,
-				'name'		=> $this->model->words['item'] . ' "Новый"',
+				'columns'	=> $model::$columns,
+				'name'		=> $model::$words['item'] . ' "Новый"',
 				'type'		=> 'form'
 			]
 		];
 		
 		self::json($language);
-	}
-	
-	public function change($id)
-	{
-		if ($this->issetAllData($this->model->columns) && $this->validate($this->model->columns))
-		{
-			$this->model->update($this->model->columns, \Wings::$post);
-			
-			$this->backToItem();
-		}
-		
-		$language = $this->model->getByID($id);
-		
-		$language =
-		[
-			'name'		=> $this->model->words['change'],
-			'columns'	=> $this->model->columns,
-			'values'	=> $language
-		];
-		
-		$this->view->change($language);
 	}
 	
 	public function index($data, $accesses)
@@ -71,6 +51,8 @@ final class Language extends Controller
 		
 		if ($access !== true) return self::json($access);
 		
+		$model = $this->model;
+		
 		$languages = $this->model->getAll();
 		
 		$languages =
@@ -78,10 +60,10 @@ final class Language extends Controller
 			'code'	=> 200,
 			'data'	=>
 			[
-				'columns'	=> $this->model->columns,
+				'columns'	=> $model::$columns,
 				'items'		=> $languages,
-				'name'		=> $this->model->words['list'],
-				'type'		=> $this->model->type
+				'name'		=> $model::$words['list'],
+				'type'		=> $model::$type
 			]
 		];
 		
@@ -94,13 +76,24 @@ final class Language extends Controller
 		
 		if ($access !== true) return self::json($access);
 		
+		$model = $this->model;
+		
+		if ($this->issetAllData($model::$columns) && $this->validate($model::$columns))
+		{
+			$this->model->update($model::$columns, \Wings::$post);
+				
+			return self::json([
+				'code'			=> 200,
+				'description'	=> ''
+			]);
+		}
+		
 		if (!isset($data['id']))
 		{
-			return
-			[
+			return self::json([
 				'code'			=> 500,
 				'description'	=> 'Не хватает данных.'
-			];
+			]);
 		}
 		
 		$language = $this->model->getByID($data['id']);
@@ -110,8 +103,8 @@ final class Language extends Controller
 			'code'	=> 200,
 			'data'	=>
 			[
-				'columns'	=> $this->model->columns,
-				'name'		=> $this->model->words['item'] . ' "' . $language['name'] . '"',
+				'columns'	=> $model::$columns,
+				'name'		=> $model::$words['item'] . ' "' . $language['name'] . '"',
 				'item'		=> $language,
 				'type'		=> 'form'
 			]
@@ -120,14 +113,27 @@ final class Language extends Controller
 		self::json($language);
 	}
 	
-	public function remove()
+	public function remove($data, $accesses)
 	{
-		$ajax = new \Applications\Ajax\Controller();
+		$access = self::checkAccess($accesses, 'delete');
 		
-		if (!isset(\Wings::$post['ids']) || empty(\Wings::$post['ids'])) return $ajax->json(['code' => 204]);
+		if ($access !== true) return self::json($access);
+		
+		$model = $this->model;
+		
+		if (!isset(\Wings::$post['ids']) || empty(\Wings::$post['ids']))
+		{
+			return self::json([
+				'code'			=> 500,
+				'description'	=> 'Не хватает данных.'
+			]);
+		}
 		
 		foreach (\Wings::$post['ids'] as $id) $this->model->delete($id);
 		
-		return $ajax->json(['code' => 200]);
+		return self::json([
+			'code'			=> 200,
+			'description'	=> ''
+		]);
 	}
 }

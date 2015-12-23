@@ -4,45 +4,53 @@ namespace Applications\Models;
 
 abstract class Model
 {
-	public		$columns	= [];
-	public		$links		= [];
-	public		$multilang	= [];
-	public		$table		= '';
-	public		$tree		= '';
-	public		$type		= 'list';
-	public		$words		= [];
+	public	static	$columns	= [];
+	public	static	$links		= [];
+	public	static	$multilang	= [];
+	public	static	$table		= '';
+	public	static	$tree		= '';
+	public	static	$type		= 'list';
+	public	static	$words		= [];
+	
+	public	$model;
 	
 	public function delete($id)
 	{
+		$model = $this->model;
+		
 		$wheres = ['id' => '='];
 		$args = ['id' => [$id, 'int', 11]];
 		
-		\Wings\DB::delete($this->table, $wheres, $args);
+		\Wings\DB::delete($model::$table, $wheres, $args);
 	}
 	
 	public function getAll($model = null)
 	{
-		list($columns, $joins) = $this->getColumnsAndJoins(true);
+		if (\is_null($model)) $model = $this->model;
+		
+		list($columns, $joins) = $this->getColumnsAndJoins($model, true);
 		
 		$this->setFieldsNames();
 		
-		if ($this->tree !== '') $result = \Wings\Tree\NestedSets::selectAll($this->table, $columns, $joins);
+		if ($model::$tree !== '') $result = \Wings\Tree\NestedSets::selectAll($model::$table, $columns, $joins);
 		else
 		{
-			$query = 'SELECT ' . $columns . ' FROM `' . $this->table . '`' . $joins;
+			$query = 'SELECT ' . $columns . ' FROM `' . $model::$table . '`' . $joins;
 			$result = \Wings\DB::fetchAll($query);
 		}
 		
-		if (!empty($this->multilang)) $result = $this->setLanguageFields($result);
+		if (!empty($model::$multilang)) $result = $this->setLanguageFields($result);
 		
 		return $result;
 	}
 	
 	public function getByID($id)
 	{
+		$model = $this->model;
+		
 		list($columns, $joins) = $this->getColumnsAndJoins();
 		
-		$query = 'SELECT ' . $columns . ' FROM `' . $this->table . '` ' . $joins . ' WHERE `' . $this->table . '`.`id` = :id';
+		$query = 'SELECT ' . $columns . ' FROM `' . $model::$table . '` ' . $joins . ' WHERE `' . $model::$table . '`.`id` = :id';
 		
 		$args = ['id' => [$id, 'int', 11]];
 		
@@ -50,13 +58,13 @@ abstract class Model
 		
 		if (!isset($result[0])) return null;
 		
-		if (!empty($this->links))
+		if (!empty($model::$links))
 		{
-			foreach ($this->links as $link)
+			foreach ($model::$links as $link)
 			{
 				$name = \strtolower($link);
 		
-				$this->columns[$name] =
+				$model::$columns[$name] =
 				[
 					'field'		=> ['type'	=> 'multiselect'],
 					'key'		=> 'parent',
@@ -73,7 +81,7 @@ abstract class Model
 		
 		$fields = $this->setFieldsNames();
 		
-		if (empty($this->multilang)) return $result[0];
+		if (empty($model::$multilang)) return $result[0];
 		
 		$item =
 		[
@@ -82,35 +90,37 @@ abstract class Model
 			'nameEn'	=> $result[0]['nameEn']
 		];
 		
-		foreach ($this->multilang as $column)
+		foreach ($model::$multilang as $column)
 		{
 			foreach ($result as $el)
 			{
 				$key = $column . '[' . $el['lang'] . ']';
 				
 				$item[$key] = $el['lang_' . $column];
-				$this->columns[$key] = $this->columns[$column];
+				$model::$columns[$key] = $model::$columns[$column];
 				
-				$this->columns[$key]['key'] = $column . '[' . $el['lang'] . ']';
-				$this->columns[$key]['name'] = $fields[$column] . ' (' . $el['nameEn'] . ')';
+				$model::$columns[$key]['key'] = $column . '[' . $el['lang'] . ']';
+				$model::$columns[$key]['name'] = $fields[$column] . ' (' . $el['nameEn'] . ')';
 				
 				if ($el['lang'] == \Wings::$language['id']) $item[$column] = $el['lang_' . $column];
 			}
 			
-			unset($this->columns[$column]);
+			unset($model::$columns[$column]);
 		}
 		
 		return $item;
 	}
 	
-	private function getColumnsAndJoins($isList = false)
+	private function getColumnsAndJoins($model = null, $isList = false)
 	{
+		if (\is_null($model)) $model = $this->model;
+		
 		$columns = [];
 		$joins = [];
 		
-		foreach ($this->columns as $key => $column)
+		foreach ($model::$columns as $key => $column)
 		{
-			if (in_array($key, $this->multilang)) continue;
+			if (in_array($key, $model::$multilang)) continue;
 			
 			if (isset($column['field']['isConfirm']) && $column['field']['isConfirm'] === true) continue;
 				
@@ -121,25 +131,25 @@ abstract class Model
 		
 				$columns[] = '`' . $tableAdd . '`.`' . $alt['field'] . '` AS `' . $column['key'] . '`';
 		
-				$joins[] = 'INNER JOIN `' . $alt['name'] . '` ' . $tableAdd . ' ON `' . $this->table . '`.`' . $alt['key1'] . '` = ' . $tableAdd . '.`' . $alt['key2'] . '`';
+				$joins[] = 'INNER JOIN `' . $alt['name'] . '` ' . $tableAdd . ' ON `' . $model::$table . '`.`' . $alt['key1'] . '` = ' . $tableAdd . '.`' . $alt['key2'] . '`';
 			}
-			else $columns[] = '`' . $this->table . '`.`' . $key . '`';
+			else $columns[] = '`' . $model::$table . '`.`' . $key . '`';
 		}
 		
-		if (!empty($this->multilang))
+		if (!empty($model::$multilang))
 		{
 			$columns[] = '`Language`.`id` AS `lang`';
 			$columns[] = '`Language`.`code` AS `code`';
 			$columns[] = '`Language`.`nameEn` AS `nameEn`';
 			
-			foreach ($this->multilang as $field) $columns[] = '`lang_' . $this->table . '`.`' . $field . '` AS `lang_' . $field . '`';
+			foreach ($model::$multilang as $field) $columns[] = '`lang_' . $model::$table . '`.`' . $field . '` AS `' . $field . '`';
 			
-			$join = 'INNER JOIN `lang_' . $this->table . '` ON `' . $this->table . '`.`id` = `lang_' . $this->table . '`.`' . lcfirst($this->table) . '`';
+			$join = 'INNER JOIN `lang_' . $model::$table . '` ON `' . $model::$table . '`.`id` = `lang_' . $model::$table . '`.`' . lcfirst($model::$table) . '`';
 			
-			if ($isList) $join .= ' AND `lang_' . $this->table . '`.`lang` = ' . \Wings::$language['id'];
+			if ($isList) $join .= ' AND `lang_' . $model::$table . '`.`lang` = ' . \Wings::$language['id'];
 			
 			$joins[] = $join;
-			$joins[] = 'INNER JOIN `Language` ON `lang_' . $this->table . '`.`lang` = `Language`.`id`';
+			$joins[] = 'INNER JOIN `Language` ON `lang_' . $model::$table . '`.`lang` = `Language`.`id`';
 		}
 		
 		return [\implode(', ', $columns), \implode(' ', $joins)];
@@ -147,7 +157,9 @@ abstract class Model
 	
 	private function getFieldsNames()
 	{
-		$fields = \array_unique(\array_merge(\array_keys($this->columns), $this->multilang));
+		$model = $this->model;
+		
+		$fields = \array_unique(\array_merge(\array_keys($model::$columns), $model::$multilang));
 		
 		$fields = '\'' . implode('\', \'', $fields) . '\'';
 		
@@ -173,15 +185,17 @@ abstract class Model
 	
 	private function getLinkData($linkModel, $id = 0)
 	{
+		$model = $this->model;
+		
 		$query =
 		'
 			SELECT
 				t.`id`,
-				lt.`' . \strtolower($this->table) . '` AS ltid
+				lt.`' . \strtolower($model::$table) . '` AS ltid
 			FROM `' . $linkModel::$table . '` t
-			LEFT OUTER JOIN `link_' . $this->table . $linkModel::$table . '` lt ON
+			LEFT OUTER JOIN `link_' . $model::$table . $linkModel::$table . '` lt ON
 				t.`id` = lt.`' . \strtolower($linkModel::$table) . '` AND
-				lt.`' . \strtolower($this->table) . '` = ' . $id . ';
+				lt.`' . \strtolower($model::$table) . '` = ' . $id . ';
 		';
 		
 		$result = \Wings\DB::fetchAll($query);
@@ -209,13 +223,15 @@ abstract class Model
 	
 	public function insert()
 	{
+		$model = $this->model;
+		
 		$args = [];
 		
-		foreach ($this->columns as $key => $column)
+		foreach ($model::$columns as $key => $column)
 		{
 			if (isset($column['generated']) && $column['generated'] === true && !isset($column['default'])) continue;
 			if (isset($column['field']['isConfirm']) && $column['field']['isConfirm'] === true) continue;
-			if (in_array($key, $this->multilang)) continue;
+			if (in_array($key, $model::$multilang)) continue;
 			
 			if (isset($column['default']))
 			{
@@ -240,17 +256,17 @@ abstract class Model
 			}
 		}
 		
-		if (!empty($this->tree)) $id = \Wings\Tree\NestedSets::insertNode($this->table, \Wings::$post['parent'], $args);
-		else $id = \Wings\DB::insert($this->table, $args);
+		if (!empty($model::$tree)) $id = \Wings\Tree\NestedSets::insertNode($model::$table, \Wings::$post['parent'], $args);
+		else $id = \Wings\DB::insert($model::$table, $args);
 		
-		if (!empty($this->multilang))
+		if (!empty($model::$multilang))
 		{
-			$table = 'lang_' . $this->table;
-			$column = lcfirst($this->table);
+			$table = 'lang_' . $model::$table;
+			$column = lcfirst($model::$table);
 			
 			$argss = [];
 			
-			foreach ($this->multilang as $field)
+			foreach ($model::$multilang as $field)
 			{
 				foreach (\Wings::$post[$field] as $lang => $value)
 				{
@@ -263,20 +279,20 @@ abstract class Model
 						];
 					}
 					
-					$argss[$lang][$field] = [$value, $this->columns[$field]['type'][0], $this->columns[$field]['type'][1]];
+					$argss[$lang][$field] = [$value, $model::$columns[$field]['type'][0], $model::$columns[$field]['type'][1]];
 				}
 			}
 			
 			foreach ($argss as $args) \Wings\DB::insert($table, $args);
 		}
 		
-		if (!empty($this->links))
+		if (!empty($model::$links))
 		{
-			foreach ($this->links as $link)
+			foreach ($model::$links as $link)
 			{
-				$arg1 = \strtolower($this->table);
+				$arg1 = \strtolower($model::$table);
 				$arg2 = \strtolower($link);
-				$table = 'link_' . $this->table . $link;
+				$table = 'link_' . $model::$table . $link;
 				
 				foreach (\Wings::$post[$arg2] as $value)
 				{
@@ -295,19 +311,23 @@ abstract class Model
 	
 	public function move($nodeID, $parentID, $nearNodeID)
 	{
-		if (!empty($this->tree))
+		$model = $this->model;
+		
+		if (!empty($model::$tree))
 		{
-			$tree = '\\Wings\\Tree\\' . $this->tree;
-			$tree::updateNode($this->table, $nodeID, $parentID, $nearNodeID);
+			$tree = '\\Wings\\Tree\\' . $model::$tree;
+			$tree::updateNode($model::$table, $nodeID, $parentID, $nearNodeID);
 		}
 		else ;
 	}
 	
 	public function prepareModel()
 	{
+		$model = $this->model;
+		
 		$result = [];
 		
-		if (!empty($this->tree))
+		if (!empty($model::$tree))
 		{
 			$result['parent'] = $this->getAll();
 			
@@ -318,16 +338,16 @@ abstract class Model
 				'type'		=> ['int', 11]
 			];
 			
-			$this->columns = \array_slice($this->columns, 0, 1, true) + ['parent' => $field] + \array_slice($this->columns, 1, null, true);
+			$model::$columns = \array_slice($model::$columns, 0, 1, true) + ['parent' => $field] + \array_slice($model::$columns, 1, null, true);
 		}
 		
-		if (!empty($this->links))
+		if (!empty($model::$links))
 		{
-			foreach ($this->links as $link)
+			foreach ($model::$links as $link)
 			{
 				$name = \strtolower($link);
 				
-				$this->columns[$name] =
+				$model::$columns[$name] =
 				[
 					'field'		=> ['type'	=> 'multiselect'],
 					'key'		=> 'parent',
@@ -338,7 +358,7 @@ abstract class Model
 			}
 		}
 		
-		if (!empty($this->multilang)) $this->setLanguages();
+		if (!empty($model::$multilang)) $this->setLanguages();
 		
 		$this->setFieldsNames();
 		
@@ -347,9 +367,11 @@ abstract class Model
 	
 	public function setFieldsNames()
 	{
+		$model = $this->model;
+		
 		$fields = $this->getFieldsNames();
 		
-		foreach ($this->columns as $key => &$value)
+		foreach ($model::$columns as $key => &$value)
 		{
 			if (isset($fields[$key])) $value['name'] = $fields[$key];
 		}
@@ -359,7 +381,9 @@ abstract class Model
 	
 	private function setLanguageFields($result)
 	{
-		foreach ($this->multilang as $column)
+		$model = $this->model;
+		
+		foreach ($model::$multilang as $column)
 		{
 			foreach ($result as &$el)
 			{
@@ -374,28 +398,32 @@ abstract class Model
 	
 	private function setLanguages()
 	{
+		$model = $this->model;
+		
 		$languages = \Wings\DB::select('Language', '`id`, `nameEn`', null, null, '`id` ASC');
 		
 		$fields = $this->getFieldsNames();
 		
-		foreach ($this->multilang as $column)
+		foreach ($model::$multilang as $column)
 		{
 			foreach ($languages as $language)
 			{
 				$key = $column . '[' . $language['id'] . ']';
 				
-				$this->columns[$key] = $this->columns[$column];
+				$model::$columns[$key] = $model::$columns[$column];
 				
-				$this->columns[$key]['key'] = $column . '[' . $language['id'] . ']';
-				$this->columns[$key]['name'] = $fields[$column] . ' (' . $language['nameEn'] . ')';
+				$model::$columns[$key]['key'] = $column . '[' . $language['id'] . ']';
+				$model::$columns[$key]['name'] = $fields[$column] . ' (' . $language['nameEn'] . ')';
 			}
 			
-			unset($this->columns[$column]);
+			unset($model::$columns[$column]);
 		}
 	}
 	
 	public function setWords()
 	{
+		$model = $this->model;
+		
 		$query = '
 			SELECT
 				lt.`add`, 
@@ -412,23 +440,25 @@ abstract class Model
 		$args =
 		[
 			'lang'	=> [\Wings::$language['id'], 'int', 3],
-			'name'	=> [$this->table, 'str', 63]
+			'name'	=> [$model::$table, 'str', 63]
 		];
 		
-		$this->words = \Wings\DB::fetchRow($query, $args);
+		$model::$words = \Wings\DB::fetchRow($query, $args);
 	}
 	
 	public function update()
 	{
+		$model = $this->model;
+		
 		$id = \Wings::$post['id'];
 		
 		$args = [];
 		
-		foreach ($this->columns as $key => $column)
+		foreach ($model::$columns as $key => $column)
 		{
 			if (isset($column['generated']) && $column['generated'] === true) continue;
 			if (isset($column['field']['isConfirm']) && $column['field']['isConfirm'] === true) continue;
-			if (in_array($key, $this->multilang)) continue;
+			if (in_array($key, $model::$multilang)) continue;
 			
 			$args[$key] = [\Wings::$post[$key], $column['type'][0], $column['type'][1]];
 		}
@@ -437,19 +467,19 @@ abstract class Model
 		{
 			$args['id'] = [$id, $column['type'][0], $column['type'][1]];
 			
-			\Wings\DB::update($this->table, $args);
+			\Wings\DB::update($model::$table, $args);
 		}
 		
-		if (!empty($this->multilang))
+		if (!empty($model::$multilang))
 		{
-			$table = 'lang_' . $this->table;
-			$column = lcfirst($this->table);
+			$table = 'lang_' . $model::$table;
+			$column = lcfirst($model::$table);
 			
 			\Wings\DB::delete($table, [$column => '='], [$column => [$id, 'int', 11]]);
 			
 			$argss = [];
 			
-			foreach ($this->multilang as $field)
+			foreach ($model::$multilang as $field)
 			{
 				foreach (\Wings::$post[$field] as $lang => $value)
 				{
@@ -462,20 +492,20 @@ abstract class Model
 						];
 					}
 					
-					$argss[$lang][$field] = [$value, $this->columns[$field]['type'][0], $this->columns[$field]['type'][1]];
+					$argss[$lang][$field] = [$value, $model::$columns[$field]['type'][0], $model::$columns[$field]['type'][1]];
 				}
 			}
 			
 			foreach ($argss as $args) \Wings\DB::insert($table, $args);
 		}
 		
-		if (!empty($this->links))
+		if (!empty($model::$links))
 		{
-			foreach ($this->links as $link)
+			foreach ($model::$links as $link)
 			{
-				$arg1 = \strtolower($this->table);
+				$arg1 = \strtolower($model::$table);
 				$arg2 = \strtolower($link);
-				$table = 'link_' . $this->table . $link;
+				$table = 'link_' . $model::$table . $link;
 				
 				\Wings\DB::delete($table, [$arg1 => '='], [$arg1 => [$id, 'int', 11]]);
 				

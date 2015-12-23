@@ -4,7 +4,7 @@ namespace Applications\Models;
 
 final class Group extends Model
 {
-	public $columns =
+	public static $columns =
 	[
 		'id'	=>
 		[
@@ -21,7 +21,7 @@ final class Group extends Model
 			'type'		=> ['str', 255]
 		]
 	];
-	public $multilang	= ['name'];
-	public $table		= 'Group';
-	public $tree		= 'NestedSets';
+	public static $multilang	= ['name'];
+	public static $table		= 'Group';
+	public static $tree		= 'NestedSets';
 }

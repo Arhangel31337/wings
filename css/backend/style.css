@@ -83,6 +83,10 @@ input[type=password]:focus {
 	border-bottom: 2px solid #2196F3;
 }
 
+label {
+	cursor: pointer;
+}
+
 .cl-b {
 	clear: both;
 }
@@ -362,7 +366,7 @@ input[type=password]:focus {
 }
 
 .input {
-	margin-bottom: 16px;
+	height: 48px;
 }
 
 .input .inputExtra {
@@ -393,6 +397,21 @@ input[type=password]:focus {
 }
 
 .checkbox input {
+	display: none;
+}
+
+.switch {
+	background: transparent url("/images/BackEnd/elements/switch_off.png") no-repeat scroll 0px 0px;
+	float: right;
+	height: 24px;
+	width: 36px;
+}
+
+.switch.checked {
+	background: transparent url("/images/BackEnd/elements/switch_on.png") no-repeat scroll 0px 0px;
+}
+
+.switch input {
 	display: none;
 }
 
@@ -810,11 +829,7 @@ table th .icon {
 }
 
 form {
-	padding: 0px 16px;
-}
-
-form div {
-	height: 48px;
+	padding: 9px 16px 0px;
 }
 
 

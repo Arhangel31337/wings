@@ -6,16 +6,24 @@ final class Workspace
 {
 	public static function initialize()
 	{
-		if (\Wings::$user->getIsActive() != 1) return \Applications\BackEnd\Workspace::authorize();
+		if (!isset(\Wings::$pathname[0])) return \Applications\BackEnd\Workspace::authorize();
+		
+		if (\Wings::$user->getIsActive() != 1)
+		{
+			$data =
+			[
+				'code'			=> 403,
+				'description'	=> 'Необходимо авторизоваться.'
+			];
+			
+			return \Applications\Ajax\Controller::json($data);
+		}
 		
 		$method = 'index';
 		
-		if (!isset(\Wings::$pathname[0])) return \Applications\BackEnd\Workspace::authorize();
 		if (isset(\Wings::$pathname[1]) && \Wings::$pathname[1] !== 'list')  $method = \Wings::$pathname[1];
 		
 		$mvc = \Wings::$workspace['namespace'] . \ucfirst(\Wings::$pathname[0]);
-		
-		if (!class_exists($mvc)) throw new \Exception('Класс ' . $mvc . ' не существует.');
 		
 		if(!method_exists($mvc, $method)) throw new \Exception('У класса ' . $mvc . ' не существует метода ' . $method . ' .');
 		

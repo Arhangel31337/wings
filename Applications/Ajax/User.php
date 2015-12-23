@@ -1,17 +1,14 @@
 <?php
 
-namespace Applications\BackEnd;
+namespace Applications\Ajax;
 
 final class User extends Controller
 {
 	function __construct ()
 	{
 		$this->model = new \Applications\Models\User();
-		
+		$this->model->model = $this->model;
 		$this->model->setWords();
-		
-		parent::__construct();
-		$this->view = new View();
 	}
 	
 	public function add()
@@ -36,54 +33,71 @@ final class User extends Controller
 		$this->view->add($user);
 	}
 	
-	public function change($id)
+	public function index($data, $accesses)
 	{
-		if ($this->issetAllData($this->model->columns) && $this->validate($this->model->columns))
-		{
-			$this->model->update();
-			
-			$this->backToItem();
-		}
+		$access = self::checkAccess($accesses, 'select');
 		
-		$user = $this->model->getByID($id);
+		if ($access !== true) return self::json($access);
 		
-		$user['password'] = '';
+		$model = $this->model;
 		
-		$user =
-		[
-			'name'		=> $this->model->words['change'],
-			'columns'	=> $this->model->columns,
-			'values'	=> $user
-		];
-		
-		$this->view->change($user);
-	}
-	
-	public function index()
-	{
 		$users = $this->model->getAll();
 		
 		$users =
 		[
-			'name'		=> $this->model->words['list'],
-			'columns'	=> $this->model->columns,
-			'items'		=> $users
+			'code'	=> 200,
+			'data'	=>
+			[
+				'columns'	=> $model::$columns,
+				'items'		=> $users,
+				'name'		=> $model::$words['list'],
+				'type'		=> $model::$type
+			]
 		];
 		
-		$this->view->items($users);
+		self::json($users);
 	}
 	
-	public function item($id)
+	public function item($data, $accesses)
 	{
-		$user = $this->model->getByID($id);
+		$access = self::checkAccess($accesses, 'update');
+		
+		if ($access !== true) return self::json($access);
+		
+		$model = $this->model;
+		
+		if ($this->issetAllData($model::$columns) && $this->validate($model::$columns))
+		{
+			$this->model->update($model::$columns, \Wings::$post);
+			
+			return self::json([
+				'code'			=> 200,
+				'description'	=> ''
+			]);
+		}
+		
+		if (!isset($data['id']))
+		{
+			return self::json([
+				'code'			=> 500,
+				'description'	=> 'Не хватает данных.'
+			]);
+		}
+		
+		$user = $this->model->getByID($data['id']);
 		
 		$user =
 		[
-			'name'		=> $this->model->words['item'] . ' "' . $user['login'] . '"',
-			'columns'	=> $this->model->columns,
-			'item'		=> $user
+			'code'	=> 200,
+			'data'	=>
+			[
+				'columns'	=> $model::$columns,
+				'item'		=> $user,
+				'name'		=> $model::$words['item'] . ' "' . $user['login'] . '"',
+				'type'		=> 'form'
+			]
 		];
 		
-		$this->view->item($user);
+		self::json($user);
 	}
 }

@@ -4,7 +4,7 @@ namespace Applications\Models;
 
 final class Language extends Model
 {
-	public $columns =
+	public static $columns =
 	[
 		'id'	=>
 		[
@@ -35,9 +35,9 @@ final class Language extends Model
 			'field'		=> ['type'	=> 'string'],
 			'style'		=> ['align'	=> 'left'],
 			'turn'		=> 4,
-			'type'		=> ['str', 63],
+			'type'		=> ['str', 5],
 			'validate'	=> ['required']
 		]
 	];
-	public $table = 'Language';
+	public static $table = 'Language';
 }

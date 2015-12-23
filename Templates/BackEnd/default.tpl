@@ -12,7 +12,7 @@
 	</div>
 	<aside>
 		<header>
-			<a class="logo" href="#">Wings</a>
+			<a class="logo" href="/ru-ru/admin/">Wings</a>
 			<div class="user">
 				<div class="select">
 					<div class="name">Arhangel31337</div>

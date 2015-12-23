@@ -1,23 +1,6 @@
 const marginHorizontal = 16;
 
-var form;
-var formWidth
-var shift;
-
 $(document).ready(function() {
-	$('form').formPrepare();
-	
-	form = $('form');
-	shift = form.find('.shift');
-	var shiftChildrens = shift.children();
-	
-	var activeShift = 1;
-	var activeChild = $(shiftChildrens[activeShift]);
-	formWidth = form.width();
-	
-	shift.width((formWidth + marginHorizontal) * shiftChildrens.length);
-	shiftChildrens.width(formWidth);
-	
 	$('input[name=mail]').keyup(function(e) {
 		if (checkLogin(true) && e.which == 13)
 		{
@@ -42,7 +25,6 @@ $(document).ready(function() {
 			method		: 'POST',
 			success		: function(json)
 			{
-				console.log(json);
 				if (json.code !== undefined)
 				{
 					if (json.code === 200)
@@ -89,10 +71,10 @@ $(document).ready(function() {
 	});
 	
 	$('input[name=login]').click(function(e) {
-		form.submit();
+		$('form').submit();
 	});
 	
-	form.submit(function(e) {
+	$('form').submit(function(e) {
 		$('.background').css('display', 'block');
 		
 		$.ajax({
@@ -108,7 +90,7 @@ $(document).ready(function() {
 			{
 				if (json.code !== undefined)
 				{
-					if (json.code === 200) location = location;
+					if (json.code === 200) location.reload();
 					else $('input[name=password]').errorShow(json.description); 
 				}
 				

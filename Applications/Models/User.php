@@ -4,13 +4,13 @@ namespace Applications\Models;
 
 final class User extends Model
 {
-	public $columns =
+	public static $columns =
 	[
 		'id'	=>
 		[
 			'field'		=> ['type'	=> 'label'],
 			'generated'	=> true,
-			'style'		=> ['align'	=> 'center'],
+			'turn'		=> 1,
 			'type'		=> ['int', 11]
 		],
 		'created'	=>
@@ -18,7 +18,7 @@ final class User extends Model
 			'default'	=> 'now',
 			'field'		=> ['type'	=> 'string'],
 			'generated'	=> true,
-			'style'		=> ['align'	=> 'center'],
+			'turn'		=> 5,
 			'type'		=> ['str', 19]
 		],
 		'lastVisit'	=>
@@ -26,14 +26,14 @@ final class User extends Model
 			'default'	=> 'now',
 			'field'		=> ['type'	=> 'string'],
 			'generated'	=> true,
-			'style'		=> ['align'	=> 'center'],
+			'turn'		=> 6,
 			'type'		=> ['str', 19]
 		],
 		'login'	=>
 		[
 			'field'		=> ['type'	=> 'string'],
 			'link'		=> true,
-			'style'		=> ['align'	=> 'center'],
+			'turn'		=> 2,
 			'type'		=> ['str', 31],
 			'validate'	=> ['required']
 		],
@@ -41,29 +41,30 @@ final class User extends Model
 		[
 			'field'		=> ['type'	=> 'password'],
 			'isFormF'	=> true,
+			'turn'		=> 4,
 			'type'		=> ['str', 127],
 			'validate'	=> ['required']
 		],
 		'mail'	=>
 		[
 			'field'		=> ['type'	=> 'string'],
-			'style'		=> ['align'	=> 'center'],
+			'turn'		=> 3,
 			'type'		=> ['str', 127],
 			'validate'	=> ['mail']
 		],
 		'isActive'	=>
 		[
-			'field'		=> ['type'	=> 'checkbox'],
-			'style'		=> ['align'	=> 'center'],
+			'field'		=> ['type'	=> 'switch'],
+			'turn'		=> 7,
 			'type'		=> ['int', 1]
 		],
 		'isDeleted'	=>
 		[
-			'field'		=> ['type'	=> 'checkbox'],
-			'style'		=> ['align'	=> 'center'],
+			'field'		=> ['type'	=> 'switch'],
+			'turn'		=> 8,
 			'type'		=> ['int', 1]
 		]
 	];
-	public $links	= ['Group'];
-	public $table	= 'User';
+	public static $links	= ['Group'];
+	public static $table	= 'User';
 }

@@ -30,25 +30,15 @@ function Element(data)
 
 Element.prototype.getHTML = function()
 {
-	var currentPage = this.currentPage;
-	
 	this.createHTML();
 	
 	this.html.find('input[type=checkbox]').each(function(i) {
 		var el = $(this);
-		el.wrap('<span class="checkbox" />');
-	});
-	
-	$(this.html[1]).find('.icon.add').click(function() {
-		pages[currentPage] =
-		{
-			method	: 'add',
-			model	: pages[currentPage - 1].model
-		};
+		if (el.hasClass('switch')) el.wrap('<span class="switch" />');
+		else el.wrap('<span class="checkbox" />');
 		
-		updatePages(currentPage + 1)
+		if (el.prop('checked')) el.parent().addClass('checked');
 	});
-	
 	
 	return this.html;
 };
@@ -69,7 +59,7 @@ Form.prototype.createHTML = function()
 		var html = $(
 			'<h2>' + form.name + '</h2>' +
 			'<div class="menu">' +
-				'<div class="icon create fl-r"><span>Сохранить</span></div>' +
+				'<div class="icon create fl-r"><span>Создать</span></div>' +
 				'<div class="cl-b"></div>' +
 			'</div>' +
 			'<form></form>'
@@ -93,9 +83,9 @@ Form.prototype.createHTML = function()
 	for (var i = 0; i < form.turnCol.length; i++)
 	{
 		var column = form.columns[form.turnCol[i]];
-		var input = $('<div></div>');
+		var input;
 		
-		if (column.generated !== undefined && column.generated === true) continue;
+		if (column.generated !== undefined && column.generated === true && form.item === undefined) continue;
 		
 		var value = '';
 		
@@ -104,13 +94,89 @@ Form.prototype.createHTML = function()
 		switch(column.field.type)
 		{
 			case 'label':
+				input = $('<input key="' + i + '" name="' + form.turnCol[i] + '" type="hidden" value="' + value + '" />');
+				break;
+			case 'password':
+				input = $('<input key="' + i + '" name="' + form.turnCol[i] + '" placeholder="' + column.name + '" type="password" value="" />');
+				break;
 			case 'string':
-				input.append('<input key="' + i + '" name="' + form.turnCol[i] + '" placeholder="' + column.name + '" type="text" value="' + value + '" />');
+				input = $('<input key="' + i + '" name="' + form.turnCol[i] + '" placeholder="' + column.name + '" type="text" value="' + value + '" />');
+				break;
+			case 'switch':
+				input = $('<label><input class="switch" id="label_' + form.turnCol[i] + '" key="' + i + '" name="' + form.turnCol[i] + '" type="checkbox" value="' + value + '" />' + column.name + '</label>');
+				if (value == 1) input.children().prop('checked', true);
 				break;
 		}
 		
+		if (column.validate !== undefined) input.attr('validate', column.validate.join(','));
+		
 		formEl.append(input);
 	}
+	
+	html.find('input').prepareInput();
+	
+	html.on('click', '.checkbox,.switch', function(e) {
+		var el = $(this).children('input');
+		(el.prop('checked')) ? el.prop('checked', false) : el.prop('checked', true);
+		$(this).toggleClass('checked');
+	});
+	
+	html.find('.icon.create').click(function(e) {
+		if (!formEl.checkForm()) return;
+		
+		var page = pages[form.currentPage - 1];
+		
+		var path = '/ru-ru/ajax/' + page.model + '/' + page.method + '/';
+		
+		var args = {};
+		
+		formEl.find('input, select, textarea').each(function(i) {
+			args[$(this).attr('name')] = $(this).val();
+		});
+		
+		ajax(path, args, function(json) {
+			pageHide(form.currentPage);
+			updatePage(form.currentPage - 2);
+		});
+	});
+	
+	html.find('.icon.save').click(function(e) {
+		if (!formEl.checkForm()) return;
+		
+		var page = pages[form.currentPage - 1];
+		
+		var path = '/ru-ru/ajax/' + page.model + '/' + page.method + '/';
+		
+		var args = {};
+		
+		formEl.find('input, select, textarea').each(function(i) {
+			args[$(this).attr('name')] = $(this).val();
+		});
+		
+		ajax(path, args, function(json) {
+			pageHide(form.currentPage);
+			updatePage(form.currentPage - 2);
+		});
+	});
+	
+	html.find('.icon.remove').click(function(e) {
+		if (!formEl.checkForm()) return;
+		
+		var page = pages[form.currentPage - 1];
+		
+		var path = '/ru-ru/ajax/' + page.model + '/remove/';
+		
+		var args = {'ids' : []};
+		
+		formEl.find('input, select, textarea').each(function(i) {
+			if ($(this).attr('name') === 'id') args['ids'][0] = $(this).val();
+		});
+		
+		ajax(path, args, function(json) {
+			pageHide(form.currentPage);
+			updatePage(form.currentPage - 2);
+		});
+	});
 	
 	this.html = html;
 };
@@ -165,6 +231,8 @@ Table.prototype.createHTML = function()
 	
 	for (var i = 0; i < table.turnCol.length; i++)
 	{
+		if (table.columns[table.turnCol[i]].isFormF) continue;
+		
 		var th = $('<th key="' + i + '">' + table.columns[table.turnCol[i]].name + '</th>');
 		
 		if (table.columns[table.turnCol[i]].style !== undefined &&
@@ -182,7 +250,14 @@ Table.prototype.createHTML = function()
 		
 		for (var i = 0; i < table.turnCol.length; i++)
 		{
-			var td = $('<td key="' + i + '">' + table.items[j][table.turnCol[i]] + '</td>');
+			if (table.columns[table.turnCol[i]].isFormF) continue;
+			
+			var value = table.items[j][table.turnCol[i]];
+			
+			if (table.columns[table.turnCol[i]].field.type === 'checkbox' ||
+				table.columns[table.turnCol[i]].field.type === 'switch') value = (value == 1) ? 'Да' : 'Нет';
+			
+			var td = $('<td key="' + i + '">' + value + '</td>');
 		
 			if (table.columns[table.turnCol[i]].style !== undefined &&
 				table.columns[table.turnCol[i]].style.align !== undefined) td.css('text-align', table.columns[table.turnCol[i]].style.align);
@@ -198,6 +273,40 @@ Table.prototype.createHTML = function()
 	html.find('.icon.filter').click(function(e) {
 		if (filters.css('display') === 'none') filters.show(500);
 		else filters.hide(500);
+	});
+	
+	$(html[1]).find('.icon.add').click(function() {
+		pages[table.currentPage] =
+		{
+			method	: 'add',
+			model	: pages[table.currentPage - 1].model
+		};
+		
+		html.find('.checkbox input').each(function(i) {
+			if ($(this).prop('checked')) $(this).parent().click();
+		});
+		
+		html.find('.selected').removeClass('selected');
+		
+		updatePage(table.currentPage)
+	});
+	
+	$(html[1]).find('.icon.remove').click(function() {
+		var args = {'ids' : []};
+		
+		html.find('.checkbox input').each(function(i) {
+			if ($(this).prop('checked')) args.ids[args.ids.length] = $(this).closest('tr').attr('key');
+		});
+		
+		html.find('.selected').removeClass('selected');
+		
+		var page = pages[table.currentPage - 1];
+		
+		var path = '/ru-ru/ajax/' + page.model + '/remove/';
+		
+		ajax(path, args, function(json) {
+			updatePage(table.currentPage - 1);
+		});
 	});
 	
 	input.click(function(e) {
@@ -277,7 +386,7 @@ Table.prototype.createHTML = function()
 			model	: pages[table.currentPage - 1].model
 		};
 		
-		updatePages(table.currentPage + 1)
+		updatePage(table.currentPage)
 	});
 	
 	html.find('thead').on('click', '.checkbox', function(e) {

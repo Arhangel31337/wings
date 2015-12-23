@@ -26,8 +26,6 @@ var windowWidth = 0;
 $(document).ready(function() {
 	$('.blockInCenter').blockInCenter();
 	
-	$('form').formPrepare();
-	
 	popup = $('.popup');
 	
 	popup.find('section > input').click(function() {
@@ -61,13 +59,26 @@ $(document).ready(function() {
 				
 				if (page.length === 3)
 				{
-					pages[(page[0] - 1)] =
+					pages[0] =
 					{
+						args	: {},
 						method	: page[2],
 						model	: page[1]
 					};
+					pages[1] =
+					{
+						args	: {},
+						method	: '',
+						model	: ''
+					};
+					pages[2] =
+					{
+						args	: {},
+						method	: '',
+						model	: ''
+					};
 					
-					updatePages(page[0] - 0);
+					updatePage(page[0] - 1);
 					
 					$(this).addClass('active');
 				}
@@ -101,6 +112,7 @@ $(document).ready(function() {
 		for (var j = 0; j < path[i][3].length; j++)
 		{
 			path[i][3][j] = path[i][3][j].split('=');
+			if (path[i][3][j][0] === undefined || path[i][3][j][0] === '') continue;
 			pages[path[i][0]].args[path[i][3][j][0]] = path[i][3][j][1];
 		}
 	}
@@ -109,19 +121,63 @@ $(document).ready(function() {
 $(window).load(function() {
 	resize();
 	
-	updatePages(0);
+	updatePage(0, true);
 });
 
 $(window).resize(function() {
 	resize();
 });
 
-function pageHide(pageNumber)
+function locationHashUpdate()
 {
+	var path = [];
+	
+	for (var i = 0; i < pages.length; i++)
+	{
+		if (pages[i].model === '' || pages[i].method === '') continue;
+		
+		var args = [];
+		var j = 0;
+		
+		for (var key in pages[i].args)
+		{
+			args[j] = key + '=' + pages[i].args[key];
+			j++;
+		}
+		
+		path[i] = i + ';' + pages[i].model + ';' + pages[i].method + ';' + args.join(',');
+	}
+	
+	location = location.origin + location.pathname + '#' + path.join('&');
+};
+
+function pageHide(pageNumber, changePage)
+{
+	if (changePage === undefined) changePage = true;
+	
+	
 	for (pageNumber; pageNumber <= pages.length; pageNumber++)
 	{
+		var prevPage = $('article[page=' + (pageNumber - 1) + ']');
+		var prevMenu =  prevPage.find('.menu');
+		prevMenu.find('.icon span').show(500);
+		prevMenu.find('.icon.fl-r').first().animate({marginRight : 0}, 500);
+		prevPage.find('.selected').removeClass('selected');
+		
 		$('article[page=' + pageNumber + ']').animate({marginLeft : '110%'}, 500);
+		
+		if (changePage)
+		{
+			pages[pageNumber - 1] =
+			{
+				args	: {},
+				method	: '',
+				model	: ''
+			};
+		}
 	}
+	
+	locationHashUpdate();
 };
 
 function pageShow(pageNumber)
@@ -131,10 +187,15 @@ function pageShow(pageNumber)
 	
 	for (var i = 0; i < pageNumber; i++)
 	{
-		$('article[page=' + (i + 1) + ']').animate({marginLeft : asideWidth + (unvis * i)});
+		var prevMenu = $('article[page=' + i + '] .menu');
+		prevMenu.find('.icon span').hide(500);
+		prevMenu.find('.icon.fl-r').first().animate({marginRight : $('article[page=' + (i + 1) + ']').outerWidth()}, 500);
+		$('article[page=' + (i + 1) + ']').animate({marginLeft : asideWidth + (unvis * i)}, 500);
 	}
 	
-	for (pageNumber++; pageNumber <= pages.length; pageNumber++) pageHide(pageNumber);
+	for (pageNumber++; pageNumber <= pages.length; pageNumber++) pageHide(pageNumber, false);
+	
+	locationHashUpdate();
 };
 
 function popupShow(content, title, button)
@@ -175,93 +236,84 @@ function resize()
 		var page = $('article[page=' + (i + 1) + ']');
 		
 		page.width(unvis * (pages.length - i));
-		if (i < pageVisible) page.css('margin-left', asideWidth + (unvis * i));
+		if (i < pageVisible)
+		{
+			$('article[page=' + i + '] .menu .icon.fl-r').first().css('margin-right', page.outerWidth());
+			page.css('margin-left', asideWidth + (unvis * i));
+		}
 	}
 };
 
-function updatePages(pageNumber)
+function updatePage(pageNumber, allPage)
 {
-	if (pageNumber === undefined) pageNumber = 0;
+	if (allPage === undefined) allPage = false;
 	
-	var path = [];
+	if (pages[pageNumber].model === '' || pages[pageNumber].method === '') return;
 	
-	for (var i = 0; i < pages.length; i++)
-	{
-		if (pages[i].model === '' || pages[i].method === '') continue;
-		
-		var args = [];
-		var j = 0;
-		
-		for (var key in pages[i].args)
+	pageShow(pageNumber + 1);
+	
+	$('article[page=' + (pageNumber + 1) + '] .background').css('display', 'block');
+	
+	$.ajax({
+		url			: '/ru-ru/ajax/' + pages[pageNumber].model + '/' + pages[pageNumber].method + '/',
+		dataType	: "json",
+		data		: pages[pageNumber].args,
+		method		: 'POST',
+		pageNumber	: (pageNumber + 1),
+		success		: function(json)
 		{
-			args[j] = key + '=' + pages[i].args[key];
-			j++;
-		}
-		
-		path[i] = i + ';' + pages[i].model + ';' + pages[i].method + ';' + args.join(',');
-		
-		if (pageNumber !== 0  && pageNumber !== (i + 1)) continue;
-		
-		pageShow(i + 1);
-		
-		$('article[page=' + (i + 1) + '] .background').css('display', 'block');
-		
-		$.ajax({
-			url			: '/ru-ru/ajax/' + pages[i].model + '/' + pages[i].method + '/',
-			dataType	: "json",
-			data		: pages[i].args,
-			method		: 'POST',
-			pageNumber	: (i + 1),
-			success		: function(json)
+			if (json.code !== undefined)
 			{
-				if (json.code !== undefined)
+				if (json.code === 200)
 				{
-					if (json.code === 200)
+					var pageNumber = this.pageNumber;
+					
+					json.data.currentPage = pageNumber;
+					
+					var page = $('article[page=' + pageNumber + ']');
+					var content;
+					
+					switch(json.data.type)
 					{
-						var pageNumber = this.pageNumber;
-						
-						json.data.currentPage = pageNumber;
-						
-						var page = $('article[page=' + pageNumber + ']');
-						var content;
-						
-						switch(json.data.type)
-						{
-							case 'form':
-								content = new Form(json.data);
-								break;
-							case 'list':
-								content = new Table(json.data);
-								break;
-						}
-						
-						page.children('section').html(content.getHTML());
-						
-						if (pageNumber > 1)
-						{
-							var backButton = $('<div class="icon back fl-l"><span>Назад</span></div>');
-							
-							backButton.click(function(e) {
-								pageHide(pageNumber);
-							});
-							
-							page.find('.menu').prepend(backButton);
-						}
+						case 'form':
+							content = new Form(json.data);
+							break;
+						case 'list':
+							content = new Table(json.data);
+							break;
 					}
-					else
+					
+					page.children('section').html(content.getHTML());
+					
+					if (pageNumber > 1)
 					{
-						popupShow('Ошибка соединения с сервером.');
+						var backButton = $('<div class="icon back fl-l"><span>Назад</span></div>');
+						
+						backButton.click(function(e) {
+							pageHide(pageNumber);
+						});
+						
+						page.find('.menu').prepend(backButton);
 					}
+					
+					if (allPage && pages.length > pageNumber) updatePage(pageNumber);
 				}
-				
-				$('article[page=' + pageNumber + '] .background').css('display', 'none');
-			},
-			error		: function(jqXHR, textStatus, errorThrown)
-			{
-				popupShow('Ошибка соединения с сервером.');
+				else if (json.code === 403)
+				{
+					popupShow(json.description);
+					setTimeout(function() {
+						location.reload();
+					}, 1000);
+				}
+				else popupShow(json.description);
 			}
-		});
-	}
-	
-	location = location.origin + location.pathname + '#' + path.join('&');
+			else popupShow('Ошибка соединения с сервером.');
+			
+			$('article[page=' + pageNumber + '] .background').css('display', 'none');
+		},
+		error		: function(jqXHR, textStatus, errorThrown)
+		{
+			popupShow('Ошибка соединения с сервером.');
+		}
+	});
 };
