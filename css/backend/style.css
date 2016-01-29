@@ -83,6 +83,23 @@ input[type=password]:focus {
 	border-bottom: 2px solid #2196F3;
 }
 
+input[type=text][disabled],
+input[type=password][disabled] {
+	background: none;
+	border-color: transparent;
+}
+
+input[type=text].multiselect,
+input[type=password].multiselect {
+	color: #000000;
+	cursor: pointer;
+}
+
+input[type=text].multiselect:hover,
+input[type=password].multiselect:hover {
+	color: #2196F3;
+}
+
 label {
 	cursor: pointer;
 }

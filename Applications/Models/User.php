@@ -8,7 +8,7 @@ final class User extends Model
 	[
 		'id'	=>
 		[
-			'field'		=> ['type'	=> 'label'],
+			'field'		=> 'label',
 			'generated'	=> true,
 			'turn'		=> 1,
 			'type'		=> ['int', 11]
@@ -16,22 +16,28 @@ final class User extends Model
 		'created'	=>
 		[
 			'default'	=> 'now',
-			'field'		=> ['type'	=> 'string'],
-			'generated'	=> true,
-			'turn'		=> 5,
-			'type'		=> ['str', 19]
-		],
-		'lastVisit'	=>
-		[
-			'default'	=> 'now',
-			'field'		=> ['type'	=> 'string'],
+			'field'		=> 'string',
 			'generated'	=> true,
 			'turn'		=> 6,
 			'type'		=> ['str', 19]
 		],
+		'group'		=>
+		[
+			'field'		=> 'multiselect',
+			'turn'		=> 5,
+			'type'		=> ['int', 11]
+		],
+		'lastVisit'	=>
+		[
+			'default'	=> 'now',
+			'field'		=> 'string',
+			'generated'	=> true,
+			'turn'		=> 7,
+			'type'		=> ['str', 19]
+		],
 		'login'	=>
 		[
-			'field'		=> ['type'	=> 'string'],
+			'field'		=> 'string',
 			'link'		=> true,
 			'turn'		=> 2,
 			'type'		=> ['str', 31],
@@ -39,29 +45,28 @@ final class User extends Model
 		],
 		'password'	=>
 		[
-			'field'		=> ['type'	=> 'password'],
+			'field'		=> 'password',
 			'isFormF'	=> true,
 			'turn'		=> 4,
-			'type'		=> ['str', 127],
-			'validate'	=> ['required']
+			'type'		=> ['str', 127]
 		],
 		'mail'	=>
 		[
-			'field'		=> ['type'	=> 'string'],
+			'field'		=> 'string',
 			'turn'		=> 3,
 			'type'		=> ['str', 127],
 			'validate'	=> ['mail']
 		],
 		'isActive'	=>
 		[
-			'field'		=> ['type'	=> 'switch'],
-			'turn'		=> 7,
+			'field'		=> 'switch',
+			'turn'		=> 8,
 			'type'		=> ['int', 1]
 		],
 		'isDeleted'	=>
 		[
-			'field'		=> ['type'	=> 'switch'],
-			'turn'		=> 8,
+			'field'		=> 'switch',
+			'turn'		=> 9,
 			'type'		=> ['int', 1]
 		]
 	];

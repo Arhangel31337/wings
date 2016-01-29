@@ -30,6 +30,8 @@ function Element(data)
 
 Element.prototype.getHTML = function()
 {
+	var el = this;
+	
 	this.createHTML();
 	
 	this.html.find('input[type=checkbox]').each(function(i) {
@@ -38,6 +40,10 @@ Element.prototype.getHTML = function()
 		else el.wrap('<span class="checkbox" />');
 		
 		if (el.prop('checked')) el.parent().addClass('checked');
+	});
+	
+	this.html.find('input.multiselect').click(function(e) {
+		console.log(el.item[$(this).attr('name')]);
 	});
 	
 	return this.html;
@@ -91,10 +97,24 @@ Form.prototype.createHTML = function()
 		
 		if (form.item !== undefined) value = form.item[form.turnCol[i]];
 		
-		switch(column.field.type)
+		switch(column.field)
 		{
 			case 'label':
 				input = $('<input key="' + i + '" name="' + form.turnCol[i] + '" type="hidden" value="' + value + '" />');
+				break;
+			case 'multiselect':
+				var label = [];
+				value = [];
+				
+				for (var j = 0; j < form.item[form.turnCol[i]].length; j++)
+				{
+					if (!form.item[form.turnCol[i]][j].selected) continue;
+					
+					label[j] = form.item[form.turnCol[i]][j].name;
+					value[j] = form.item[form.turnCol[i]][j].id;
+				}
+				
+				input = $('<input class="multiselect" disabled ids="' + value.join(',') + '" key="' + i + '" name="' + form.turnCol[i] + '" placeholder="' + column.name + '" type="text" value="' + label.join(', ') + '" />');
 				break;
 			case 'password':
 				input = $('<input key="' + i + '" name="' + form.turnCol[i] + '" placeholder="' + column.name + '" type="password" value="" />');
@@ -212,7 +232,7 @@ Table.prototype.createHTML = function()
 		var column = table.columns[table.turnCol[i]];
 		var input = $('<div></div>');
 		
-		switch(column.field.type)
+		switch(column.field)
 		{
 			case 'label':
 			case 'string':
@@ -254,8 +274,8 @@ Table.prototype.createHTML = function()
 			
 			var value = table.items[j][table.turnCol[i]];
 			
-			if (table.columns[table.turnCol[i]].field.type === 'checkbox' ||
-				table.columns[table.turnCol[i]].field.type === 'switch') value = (value == 1) ? 'Да' : 'Нет';
+			if (table.columns[table.turnCol[i]].field === 'checkbox' ||
+				table.columns[table.turnCol[i]].field === 'switch') value = (value == 1) ? 'Да' : 'Нет';
 			
 			var td = $('<td key="' + i + '">' + value + '</td>');
 		

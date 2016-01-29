@@ -44,7 +44,7 @@ class Controller
 		foreach ($columns as $key => $value)
 		{
 			if (isset($value['generated']) && $value['generated'] === true && !isset($field['field']['isConfirm'])) continue;
-			if ($value['field']['type'] === 'checkbox') continue;
+			if ($value['field'] === 'checkbox') continue;
 			
 			if (isset(\Wings::$post[$key])) continue;
 			else return false;
@@ -75,7 +75,7 @@ class Controller
 	{
 		foreach ($fields as $key => $field)
 		{
-			if (!isset($field['validate']) && !isset($field['field']['isConfirm'])) continue;
+			if (!isset($field['validate'])) continue;
 			
 			if (isset($field['validate']))
 			{
@@ -84,11 +84,6 @@ class Controller
 					if ($value === 'checked' && !isset(\Wings::$post[$key])) return false;
 					if (!\Wings\Validation::$value(\Wings::$post[$key])) return false;
 				}
-			}
-			
-			if (isset($field['field']['isConfirm']))
-			{
-				if (\Wings::$post[$key] !== \Wings::$post[$field['field']['fieldKey']]) return false;
 			}
 		}
 	

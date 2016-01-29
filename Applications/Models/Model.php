@@ -64,13 +64,6 @@ abstract class Model
 			{
 				$name = \strtolower($link);
 		
-				$model::$columns[$name] =
-				[
-					'field'		=> ['type'	=> 'multiselect'],
-					'key'		=> 'parent',
-					'type'		=> ['int', 11]
-				];
-		
 				$linkModel = \explode('\\', \get_called_class());
 				$linkModel[(\count($linkModel) - 2)] = $link;
 				$linkModel = '\\' . \implode('\\', $linkModel);
@@ -120,9 +113,7 @@ abstract class Model
 		
 		foreach ($model::$columns as $key => $column)
 		{
-			if (in_array($key, $model::$multilang)) continue;
-			
-			if (isset($column['field']['isConfirm']) && $column['field']['isConfirm'] === true) continue;
+			if (in_array($key, $model::$multilang) || $column['field'] === 'multiselect') continue;
 				
 			if (isset($column['alterTable']))
 			{
@@ -230,7 +221,6 @@ abstract class Model
 		foreach ($model::$columns as $key => $column)
 		{
 			if (isset($column['generated']) && $column['generated'] === true && !isset($column['default'])) continue;
-			if (isset($column['field']['isConfirm']) && $column['field']['isConfirm'] === true) continue;
 			if (in_array($key, $model::$multilang)) continue;
 			
 			if (isset($column['default']))
@@ -247,7 +237,7 @@ abstract class Model
 			}
 			else
 			{
-				if ($column['field']['type'] === 'checkbox')
+				if ($column['field'] === 'checkbox')
 				{
 					if (isset(\Wings::$post[$key])) $args[$key] = [1, $column['type'][0], $column['type'][1]];
 					else $args[$key] = [0, $column['type'][0], $column['type'][1]];
@@ -346,13 +336,6 @@ abstract class Model
 			foreach ($model::$links as $link)
 			{
 				$name = \strtolower($link);
-				
-				$model::$columns[$name] =
-				[
-					'field'		=> ['type'	=> 'multiselect'],
-					'key'		=> 'parent',
-					'type'		=> ['int', 11]
-				];
 				
 				$result[$name] = $this->getLinkData('\\Applications\\Models\\' . $link);
 			}
@@ -457,7 +440,6 @@ abstract class Model
 		foreach ($model::$columns as $key => $column)
 		{
 			if (isset($column['generated']) && $column['generated'] === true) continue;
-			if (isset($column['field']['isConfirm']) && $column['field']['isConfirm'] === true) continue;
 			if (in_array($key, $model::$multilang)) continue;
 			
 			$args[$key] = [\Wings::$post[$key], $column['type'][0], $column['type'][1]];

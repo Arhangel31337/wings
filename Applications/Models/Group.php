@@ -8,14 +8,14 @@ final class Group extends Model
 	[
 		'id'	=>
 		[
-			'field'		=> ['type'	=> 'label'],
+			'field'		=> 'label',
 			'generated'	=> true,
 			'style'		=> ['align'	=> 'center'],
 			'type'		=> ['int', 3]
 		],
 		'name'	=>
 		[
-			'field'		=> ['type'	=> 'string'],
+			'field'		=> 'string',
 			'link'		=> true,
 			'style'		=> ['align'	=> 'center'],
 			'type'		=> ['str', 255]

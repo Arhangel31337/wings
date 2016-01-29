@@ -8,14 +8,14 @@ final class Language extends Model
 	[
 		'id'	=>
 		[
-			'field'		=> ['type'	=> 'label'],
+			'field'		=> 'label',
 			'generated'	=> true,
 			'turn'		=> 1,
 			'type'		=> ['int', 3]
 		],
 		'name'	=>
 		[
-			'field'		=> ['type'	=> 'string'],
+			'field'		=> 'string',
 			'link'		=> true,
 			'style'		=> ['align'	=> 'left'],
 			'turn'		=> 2,
@@ -24,7 +24,7 @@ final class Language extends Model
 		],
 		'nameEn'	=>
 		[
-			'field'		=> ['type'	=> 'string'],
+			'field'		=> 'string',
 			'style'		=> ['align'	=> 'left'],
 			'turn'		=> 3,
 			'type'		=> ['str', 63],
@@ -32,7 +32,7 @@ final class Language extends Model
 		],
 		'code'	=>
 		[
-			'field'		=> ['type'	=> 'string'],
+			'field'		=> 'string',
 			'style'		=> ['align'	=> 'left'],
 			'turn'		=> 4,
 			'type'		=> ['str', 5],
