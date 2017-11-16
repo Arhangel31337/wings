@@ -78,7 +78,8 @@ final class File
 					$fileMime = \preg_replace('/[\s\.]/', '_', \mime_content_type($filePath));
 					$type = \explode('/', $fileMime);
 					
-					$userTempFiles[] = [
+					$userTempFiles[] =
+					[
 						'level' => 0,
 						'pageName' => 'Новые',
 						'id' => 0,

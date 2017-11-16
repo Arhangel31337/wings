@@ -34,6 +34,30 @@ final class Wings
 		$this->initialize();
 	}
 	
+	private function addTimestampLink($link)
+	{
+		$fullpath = $_SERVER['DOCUMENT_ROOT'] . $link;
+		
+		$timestamp = 'undefined';
+		
+		if (\file_exists($fullpath)) $timestamp = filemtime($fullpath);
+		
+		if (strpos($link, '?')) $link .= '&filemtime=' . $timestamp;
+		else $link .= '?filemtime=' . $timestamp;
+		
+		return $link;
+	}
+	
+	private function getSettings()
+	{
+		$settings = \Wings\Autoloader::arrayFiles(self::$dir . 'personal_config.php');
+		$personal_settings = \Wings\Autoloader::arrayFiles(self::$dir . 'config.php');
+		
+		$settings = \array_replace_recursive($personal_settings, $settings);
+		
+		return $settings;
+	}
+	
 	private function globalsInterpretation()
 	{
 		session_start();
@@ -58,11 +82,35 @@ final class Wings
 	
 	private function initialize()
 	{
-		$settings = \Wings\Autoloader::arrayFiles(self::$dir . 'personal_config.php');
-		$personal_settings = \Wings\Autoloader::arrayFiles(self::$dir . 'config.php');
+		$settings = $this->getSettings();
 		
-		$settings = \array_replace_recursive($personal_settings, $settings);
+		$this->setCoreSettings($settings);
 		
+		\Wings\DB::init($settings['db']);
+		
+		$this->setHostSettings();
+		
+		$this->setWorkspaceSettings($settings);
+		
+		$this->setUser();
+		
+		$this->initSmarty($settings);
+	}
+	
+	private function initSmarty($settings)
+	{
+		require $_SERVER['DOCUMENT_ROOT'] . '/Modules/Smarty/Smarty.class.php';
+		
+		self::$smarty = new Smarty();
+		self::$smarty->muteExpectedErrors();
+		self::$smarty->setTemplateDir($_SERVER['DOCUMENT_ROOT'] . '/Templates/' . self::$workspace['name'] . '/');
+		self::$smarty->setCompileDir(self::$dir . 'Compile/Smarty/');
+		self::$smarty->setCacheDir(self::$dir . 'Cache/Smarty/');
+		self::$smarty->debugging = $settings['debug']['smarty'];
+	}
+	
+	public function setCoreSettings($settings)
+	{
 		foreach ($settings['php'] as $key => $value) ini_set($key, $value);
 		
 		self::$view['meta'] = $settings['meta'];
@@ -75,10 +123,12 @@ final class Wings
 		\Wings\Autoloader::$debug = $settings['debug']['autoload'];
 		\Wings\Exception::$debug = $settings['debug']['exception'];
 		\Wings\Exception::$debugType = $settings['debug']['excType'];
-		
-		\Wings\DB::init($settings['db']);
-		
+	}
+	
+	public function setHostSettings()
+	{
 		self::$isAjax = false;
+		
 		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') self::$ajax = true;
 		
 		$host = \str_replace('www.', '', $_SERVER['HTTP_HOST']);
@@ -95,6 +145,26 @@ final class Wings
 		
 		if (!isset(self::$pathname[0])) self::$pathname[0] = '';
 		
+		$this->testHostRules();
+	}
+	
+	public function setUser()
+	{
+		self::$user = new \Wings\User();
+		
+		if (!\is_null(self::$user->getId()))
+		{
+			$args =
+			[
+				'lastVisit'	=> [date('Y-m-d H:i:s'), 'str', 19],
+				'id'		=> self::$user->getId()
+			];
+			\Wings\UserGroupeModel::userUpdate($args);
+		}
+	}
+	
+	public function setWorkspaceSettings($settings)
+	{
 		foreach ($settings['workspace'] as $key => $value)
 		{
 			if ($value['url'] === null)
@@ -116,35 +186,6 @@ final class Wings
 		else \array_splice(self::$pathname, 0, 1);
 		
 		self::$workspace['host'] = self::$host['name'];
-		/*
-		if (isset(self::$language) && !empty(self::$language))
-		{
-			self::$words = \Wings\Autoloader::arrayFiles(
-				$_SERVER['DOCUMENT_ROOT'] .'/Applications/Languages/' . self::$language['code'] .'.php'
-			);
-		}
-		*/
-		if ($this->testHostRules() !== true) return;
-		
-		self::$user = new \Wings\User();
-		
-		if (!\is_null(self::$user->getId()))
-		{
-			$args = [
-				'lastVisit'	=> [date('Y-m-d H:i:s'), 'str', 19],
-				'id'		=> self::$user->getId()
-			];
-			\Wings\UserGroupeModel::userUpdate($args);
-		}
-		
-		require $_SERVER['DOCUMENT_ROOT'] . '/Modules/Smarty/Smarty.class.php';
-		
-		self::$smarty = new Smarty();
-		self::$smarty->muteExpectedErrors();
-		self::$smarty->setTemplateDir($_SERVER['DOCUMENT_ROOT'] . '/Templates/' . self::$workspace['name'] . '/');
-		self::$smarty->setCompileDir(self::$dir . 'Compile/Smarty/');
-		self::$smarty->setCacheDir(self::$dir . 'Cache/Smarty/');
-		self::$smarty->debugging = $settings['debug']['smarty'];
 	}
 	
 	public function start()
@@ -286,6 +327,15 @@ final class Wings
 		self::$view['workspace'] = self::$workspace;
 		self::$view['words'] = self::$words;
 		//trace(self::$view);
+		
+		foreach (self::$view['files'] as $key1 => $value1)
+		{
+			foreach ($value1 as $key2 => $value2)
+			{
+				if (!isset($value2['src'])) self::$view['files'][$key1][$key2] = $this->addTimestampLink($value2);
+				else self::$view['files'][$key1][$key2]['src'] = $this->addTimestampLink($value2['src']);
+			}
+		}
 		
 		if (self::$view['type'] === 'http')
 		{

@@ -56,10 +56,10 @@ class Exception extends \Exception
     
     public static function exception($exceptionHandler)
     {
-        self::$errorNumber = $exceptionHandler->code;
-        self::$errorMessage = $exceptionHandler->message;
-        self::$errorFile = $exceptionHandler->file;;
-        self::$errorLine = $exceptionHandler->line;;
+        self::$errorNumber = $exceptionHandler->getCode();
+        self::$errorMessage = $exceptionHandler->getMessage();
+        self::$errorFile = $exceptionHandler->getFile();
+        self::$errorLine = $exceptionHandler->getLine();
         self::$errorDescription = '';
         self::$errorTrace = \array_slice(\debug_backtrace(), 2);
         self::Report('Report' . self::$debugType);

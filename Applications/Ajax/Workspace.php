@@ -6,8 +6,6 @@ final class Workspace
 {
 	public static function initialize()
 	{
-		if (!isset(\Wings::$pathname[0])) return \Applications\BackEnd\Workspace::authorize();
-		
 		if (\Wings::$user->getIsActive() != 1)
 		{
 			$data =
@@ -16,7 +14,7 @@ final class Workspace
 				'description'	=> 'Необходимо авторизоваться.'
 			];
 			
-			return \Applications\Ajax\Controller::json($data);
+			return Controller::json($data);
 		}
 		
 		$method = 'index';
@@ -29,7 +27,31 @@ final class Workspace
 		
 		$accesses = \Wings\Page::getPageTypeAccess(\Wings::$pathname[0]);
 		
+		$access = false;
+		
+		switch ($method)
+		{
+			case 'add':
+				$access = \Applications\Controller::checkAccess($accesses, 'insert');
+				break;
+			case 'change':
+				$access = \Applications\Controller::checkAccess($accesses, 'update');
+				break;
+			case 'item':
+				$access = \Applications\Controller::checkAccess($accesses, 'select');
+				break;
+			case 'remove':
+				$access = \Applications\Controller::checkAccess($accesses, 'delete');
+				break;
+			default:
+				$access = \Applications\Controller::checkAccess($accesses, 'select');
+				break;
+		}
+		
+		if ($access !== true) return \Applications\Ajax\Controller::json($access);
+		
 		$mvc = new $mvc();
-		$mvc->$method(\Wings::$post, $accesses);
+		
+		$mvc->$method(\Wings::$post);
 	}
 }

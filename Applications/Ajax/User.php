@@ -7,16 +7,18 @@ final class User extends Controller
 	function __construct ()
 	{
 		$this->model = new \Applications\Models\User();
-		$this->model->model = $this->model;
-		$this->model->setWords();
 	}
 	
-	public function add()
+	public function add($data)
 	{
-		if ($this->issetAllData($this->model->columns) && $this->validate($this->model->columns))
+		if ($this->issetAllData($this->model::$columns) && $this->validate($this->model::$columns))
 		{
-			$this->model->insert();
-			$this->backToList();
+			$id = $this->model->insert();
+			
+			return self::json([
+				'code'			=> 200,
+				'description'	=> $id
+			]);
 		}
 		
 		$user = $this->model->prepareModel();
@@ -25,22 +27,40 @@ final class User extends Controller
 		
 		$user =
 		[
-			'name'		=> $this->model->words['add'],
-			'columns'	=> $this->model->columns,
-			'values'	=> $user
+			'code'	=> 200,
+			'data'	=>
+			[
+				'columns'	=> $this->model::$columns,
+				'name'		=> $this->model::$words['add'],
+				'type'		=> 'form'
+			]
 		];
 		
-		$this->view->add($user);
+		self::json($user);
 	}
 	
-	public function index($data, $accesses)
+	public function change($id)
 	{
-		$access = self::checkAccess($accesses, 'select');
-		
-		if ($access !== true) return self::json($access);
-		
-		$model = $this->model;
-		
+		if (self::issetAllData($this->model::$columns) && self::validate($this->model::$columns))
+		{
+			$this->model->update();
+			
+			return self::json([
+				'code'			=> 200,
+				'description'	=> ''
+			]);
+		}
+		else
+		{
+			return self::json([
+				'code'			=> 500,
+				'description'	=> 'Не хватает данных.'
+			]);
+		}
+	}
+	
+	public function index($data)
+	{
 		$users = $this->model->getAll();
 		
 		$users =
@@ -48,34 +68,18 @@ final class User extends Controller
 			'code'	=> 200,
 			'data'	=>
 			[
-				'columns'	=> $model::$columns,
+				'columns'	=> $this->model::$columns,
 				'items'		=> $users,
-				'name'		=> $model::$words['list'],
-				'type'		=> $model::$type
+				'name'		=> $this->model::$words['list'],
+				'type'		=> $this->model::$type
 			]
 		];
 		
 		self::json($users);
 	}
 	
-	public function item($data, $accesses)
+	public function item($data)
 	{
-		$access = self::checkAccess($accesses, 'update');
-		
-		if ($access !== true) return self::json($access);
-		
-		$model = $this->model;
-		
-		if ($this->issetAllData($model::$columns) && $this->validate($model::$columns))
-		{
-			$this->model->update($model::$columns, \Wings::$post);
-			
-			return self::json([
-				'code'			=> 200,
-				'description'	=> ''
-			]);
-		}
-		
 		if (!isset($data['id']))
 		{
 			return self::json([
@@ -91,9 +95,9 @@ final class User extends Controller
 			'code'	=> 200,
 			'data'	=>
 			[
-				'columns'	=> $model::$columns,
+				'columns'	=> $this->model::$columns,
 				'item'		=> $user,
-				'name'		=> $model::$words['item'] . ' "' . $user['login'] . '"',
+				'name'		=> $this->model::$words['item'] . ' "' . $user['login'] . '"',
 				'type'		=> 'form'
 			]
 		];

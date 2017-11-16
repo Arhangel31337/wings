@@ -1,22 +1,24 @@
 var articlesAreaWidth = 0;
 var asideWidth = 256;
-var padding = 16;
 var pages =
 [
 	{
-		args	: {},
-		method	: '',
-		model	: ''
+		args		: {},
+		method		: '',
+		model		: '',
+		delegate	: null
 	},
 	{
-		args	: {},
-		method	: '',
-		model	: ''
+		args		: {},
+		method		: '',
+		model		: '',
+		delegate	: null
 	},
 	{
-		args	: {},
-		method	: '',
-		model	: ''
+		args		: {},
+		method		: '',
+		model		: '',
+		delegate	: null
 	}
 ];
 var popup;
@@ -61,21 +63,24 @@ $(document).ready(function() {
 				{
 					pages[0] =
 					{
-						args	: {},
-						method	: page[2],
-						model	: page[1]
+						args		: {},
+						method		: page[2],
+						model		: page[1],
+						delegate	: null
 					};
 					pages[1] =
 					{
-						args	: {},
-						method	: '',
-						model	: ''
+						args		: {},
+						method		: '',
+						model		: '',
+						delegate	: null
 					};
 					pages[2] =
 					{
-						args	: {},
-						method	: '',
-						model	: ''
+						args		: {},
+						method		: '',
+						model		: '',
+						delegate	: null
 					};
 					
 					updatePage(page[0] - 1);
@@ -112,20 +117,30 @@ $(document).ready(function() {
 		for (var j = 0; j < path[i][3].length; j++)
 		{
 			path[i][3][j] = path[i][3][j].split('=');
-			if (path[i][3][j][0] === undefined || path[i][3][j][0] === '') continue;
+			if (path[i][3][j][1] === undefined || path[i][3][j][1] === '') continue;
 			pages[path[i][0]].args[path[i][3][j][0]] = path[i][3][j][1];
 		}
 	}
 });
 
 $(window).load(function() {
-	resize();
+	windowHeight = $(window).height();
+	windowWidth = $(window).width();
+	
+	articlesAreaWidth = windowWidth - asideWidth;
+	
+	$('body > section').width(articlesAreaWidth);
+	
+	$('article[page=1]').css('width', '100%');
 	
 	updatePage(0, true);
 });
 
 $(window).resize(function() {
-	resize();
+	windowHeight = $(window).height();
+	windowWidth = $(window).width();
+	
+	$('body > section').width(windowWidth - asideWidth);
 });
 
 function locationHashUpdate()
@@ -134,7 +149,7 @@ function locationHashUpdate()
 	
 	for (var i = 0; i < pages.length; i++)
 	{
-		if (pages[i].model === '' || pages[i].method === '') continue;
+		if (pages[i].model === '' || pages[i].method === '' || pages[i].delegate !== null) continue;
 		
 		var args = [];
 		var j = 0;
@@ -155,7 +170,6 @@ function pageHide(pageNumber, changePage)
 {
 	if (changePage === undefined) changePage = true;
 	
-	
 	for (pageNumber; pageNumber <= pages.length; pageNumber++)
 	{
 		var prevPage = $('article[page=' + (pageNumber - 1) + ']');
@@ -170,9 +184,10 @@ function pageHide(pageNumber, changePage)
 		{
 			pages[pageNumber - 1] =
 			{
-				args	: {},
-				method	: '',
-				model	: ''
+				args		: {},
+				method		: '',
+				model		: '',
+				delegate	: null
 			};
 		}
 	}
@@ -180,20 +195,35 @@ function pageHide(pageNumber, changePage)
 	locationHashUpdate();
 };
 
-function pageShow(pageNumber)
+function pageShow(pageNumber, reverse = 1, changePage = false)
 {
-	var sum = pageNumber + 1;
-	var unvis = articlesAreaWidth / sum;
+	windowHeight = $(window).height();
+	windowWidth = $(window).width();
 	
-	for (var i = 0; i < pageNumber; i++)
+	articlesAreaWidth = windowWidth - asideWidth;
+	
+	var pageVisible = 0;
+	
+	for (var i = 0; i < pages.length; i++)
 	{
-		var prevMenu = $('article[page=' + i + '] .menu');
-		prevMenu.find('.icon span').hide(500);
-		prevMenu.find('.icon.fl-r').first().animate({marginRight : $('article[page=' + (i + 1) + ']').outerWidth()}, 500);
-		$('article[page=' + (i + 1) + ']').animate({marginLeft : asideWidth + (unvis * i)}, 500);
+		if (pages[i].model != '') pageVisible++;
 	}
 	
-	for (pageNumber++; pageNumber <= pages.length; pageNumber++) pageHide(pageNumber, false);
+	var dividend = pageVisible + reverse;
+	
+	for (var i = 1; i < pageNumber; i++)
+	{
+		var width = ((dividend - i) / dividend * 100) + '%';
+		var marginLeft = (i / dividend * 100) + '%';
+		var marginRight = ((dividend - i) / (dividend - i + 1) * 100) + '%';
+		
+		var prevMenu = $('article[page=' + i + '] .menu');
+		prevMenu.find('.icon span').hide(500);
+		$('article[page=' + (i + 1) + ']').animate({width : width, marginLeft : marginLeft}, 500);
+		prevMenu.find('.icon.fl-r').first().animate({marginRight : marginRight}, 500);
+	}
+	
+	for (pageNumber++; pageNumber <= pages.length; pageNumber++) pageHide(pageNumber, changePage);
 	
 	locationHashUpdate();
 };
@@ -217,29 +247,28 @@ function resize()
 	windowHeight = $(window).height();
 	windowWidth = $(window).width();
 	
-	articlesAreaWidth = windowWidth - asideWidth - padding * 2;
+	articlesAreaWidth = windowWidth - asideWidth;
 	
-	$('body > section').width(windowWidth);
+	$('body > section').width(articlesAreaWidth);
 	
 	var pageVisible = 0;
 	
 	for (var i = 0; i < pages.length; i++)
 	{
-		if ($('body').width() > ($('article[page=' + (i + 1) + ']').css('margin-left').replace('px', '') - 0)) pageVisible++;
+		if (pages[i].model != '') pageVisible++;
 	}
 	
-	var sum = pageVisible + 1;
-	var unvis = articlesAreaWidth / pages.length;
+	var dividend = pageVisible + 1;
 	
 	for (var i = 0; i < pages.length; i++)
 	{
 		var page = $('article[page=' + (i + 1) + ']');
 		
-		page.width(unvis * (pages.length - i));
+		page.css('width', ((dividend - i) / dividend * 100) + '%');
 		if (i < pageVisible)
 		{
 			$('article[page=' + i + '] .menu .icon.fl-r').first().css('margin-right', page.outerWidth());
-			page.css('margin-left', asideWidth + (unvis * i));
+			page.css('margin-left', (i / dividend * 100) + '%');
 		}
 	}
 };
@@ -281,6 +310,9 @@ function updatePage(pageNumber, allPage)
 						case 'list':
 							content = new Table(json.data);
 							break;
+						case 'tree':
+							content = new Tree(json.data);
+							break;
 					}
 					
 					page.children('section').html(content.getHTML());
@@ -290,13 +322,13 @@ function updatePage(pageNumber, allPage)
 						var backButton = $('<div class="icon back fl-l"><span>Назад</span></div>');
 						
 						backButton.click(function(e) {
-							pageHide(pageNumber);
+							pageShow(pageNumber - 1, 0, true);
 						});
 						
 						page.find('.menu').prepend(backButton);
 					}
 					
-					if (allPage && pages.length > pageNumber) updatePage(pageNumber);
+					if (allPage && pages.length > pageNumber) updatePage(pageNumber, allPage);
 				}
 				else if (json.code === 403)
 				{

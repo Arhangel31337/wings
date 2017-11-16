@@ -4,7 +4,7 @@ namespace Applications\Models;
 
 final class User extends Model
 {
-	public static $columns =
+	public	static	$columns =
 	[
 		'id'	=>
 		[
@@ -24,6 +24,7 @@ final class User extends Model
 		'group'		=>
 		[
 			'field'		=> 'multiselect',
+			'isFormF'	=> true,
 			'turn'		=> 5,
 			'type'		=> ['int', 11]
 		],
@@ -38,7 +39,6 @@ final class User extends Model
 		'login'	=>
 		[
 			'field'		=> 'string',
-			'link'		=> true,
 			'turn'		=> 2,
 			'type'		=> ['str', 31],
 			'validate'	=> ['required']
@@ -70,6 +70,6 @@ final class User extends Model
 			'type'		=> ['int', 1]
 		]
 	];
-	public static $links	= ['Group'];
-	public static $table	= 'User';
+	public	static	$links	= ['Group'];
+	public	static	$table	= 'User';
 }

@@ -119,7 +119,8 @@ final class DB
 	{
 		$keys = array_keys($args);
 		
-		$query = 'INSERT INTO `' . $table . '` (`' . implode('`, `', $keys) . '`) VALUES (:' . implode(', :', $keys) . ');';
+		if (empty($args)) $query = 'INSERT INTO `' . $table . '` () VALUES ();';
+		else $query = 'INSERT INTO `' . $table . '` (`' . implode('`, `', $keys) . '`) VALUES (:' . implode(', :', $keys) . ');';
 		
 		self::Query($query, $args);
 		

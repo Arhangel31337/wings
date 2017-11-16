@@ -14,9 +14,14 @@ abstract class Model
 	
 	public	$model;
 	
-	public function delete($id)
+	public function __construct()
 	{
-		$model = $this->model;
+		$this->setWords();
+	}
+	
+	public function delete($id, $model = null)
+	{
+		if (\is_null($model)) $model = $this;
 		
 		$wheres = ['id' => '='];
 		$args = ['id' => [$id, 'int', 11]];
@@ -26,7 +31,7 @@ abstract class Model
 	
 	public function getAll($model = null)
 	{
-		if (\is_null($model)) $model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		list($columns, $joins) = $this->getColumnsAndJoins($model, true);
 		
@@ -44,9 +49,9 @@ abstract class Model
 		return $result;
 	}
 	
-	public function getByID($id)
+	public function getByID($id, $model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		list($columns, $joins) = $this->getColumnsAndJoins();
 		
@@ -63,7 +68,7 @@ abstract class Model
 			foreach ($model::$links as $link)
 			{
 				$name = \strtolower($link);
-		
+				
 				$linkModel = \explode('\\', \get_called_class());
 				$linkModel[(\count($linkModel) - 2)] = $link;
 				$linkModel = '\\' . \implode('\\', $linkModel);
@@ -85,17 +90,19 @@ abstract class Model
 		
 		foreach ($model::$multilang as $column)
 		{
-			foreach ($result as $el)
+			foreach ($result as $i => $el)
 			{
 				$key = $column . '[' . $el['lang'] . ']';
 				
-				$item[$key] = $el['lang_' . $column];
+				$item[$key] = $el[$column];
 				$model::$columns[$key] = $model::$columns[$column];
 				
-				$model::$columns[$key]['key'] = $column . '[' . $el['lang'] . ']';
+				$model::$columns[$key]['key'] = $key;
 				$model::$columns[$key]['name'] = $fields[$column] . ' (' . $el['nameEn'] . ')';
+				if ($model::$columns[$key]['turn'] > 9) $model::$columns[$key]['turn'] = (int)(1 . $i . $model::$columns[$key]['turn']);
+				else $model::$columns[$key]['turn'] = (int)(1 . $i . '0' . $model::$columns[$key]['turn']);
 				
-				if ($el['lang'] == \Wings::$language['id']) $item[$column] = $el['lang_' . $column];
+				if ($el['lang'] == \Wings::$language['id']) $item[$column] = $el[$column];
 			}
 			
 			unset($model::$columns[$column]);
@@ -106,7 +113,7 @@ abstract class Model
 	
 	private function getColumnsAndJoins($model = null, $isList = false)
 	{
-		if (\is_null($model)) $model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		$columns = [];
 		$joins = [];
@@ -146,13 +153,13 @@ abstract class Model
 		return [\implode(', ', $columns), \implode(' ', $joins)];
 	}
 	
-	private function getFieldsNames()
+	private function getFieldsNames($model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		$fields = \array_unique(\array_merge(\array_keys($model::$columns), $model::$multilang));
 		
-		$fields = '\'' . implode('\', \'', $fields) . '\'';
+		$fields = '\'' . \implode('\', \'', $fields) . '\'';
 		
 		$query = '
 			SELECT
@@ -174,19 +181,19 @@ abstract class Model
 		return $fields;
 	}
 	
-	private function getLinkData($linkModel, $id = 0)
+	private function getLinkData($linkModel, $id = 0, $model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		$query =
 		'
 			SELECT
 				t.`id`,
-				lt.`' . \strtolower($model::$table) . '` AS ltid
+				lt.`' . \lcfirst($model::$table) . '` AS ltid
 			FROM `' . $linkModel::$table . '` t
 			LEFT OUTER JOIN `link_' . $model::$table . $linkModel::$table . '` lt ON
-				t.`id` = lt.`' . \strtolower($linkModel::$table) . '` AND
-				lt.`' . \strtolower($model::$table) . '` = ' . $id . ';
+				t.`id` = lt.`' . \lcfirst($linkModel::$table) . '` AND
+				lt.`' . \lcfirst($model::$table) . '` = ' . $id . ';
 		';
 		
 		$result = \Wings\DB::fetchAll($query);
@@ -199,7 +206,7 @@ abstract class Model
 		
 		$links = \treeToArray($links);
 		
-		usort($links, function ($a, $b) {
+		\usort($links, function ($a, $b) {
 			return strcmp($a['name'], $b['name']);
 		});
 		
@@ -212,9 +219,9 @@ abstract class Model
 		return $links;
 	}
 	
-	public function insert()
+	public function insert($model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		$args = [];
 		
@@ -299,9 +306,9 @@ abstract class Model
 		return $id;
 	}
 	
-	public function move($nodeID, $parentID, $nearNodeID)
+	public function move($nodeID, $parentID, $nearNodeID, $model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		if (!empty($model::$tree))
 		{
@@ -311,9 +318,9 @@ abstract class Model
 		else ;
 	}
 	
-	public function prepareModel()
+	public function prepareModel($model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		$result = [];
 		
@@ -323,8 +330,9 @@ abstract class Model
 			
 			$field =
 			[
-				'field'		=> ['type'	=> 'select'],
+				'field'		=> 'select',
 				'key'		=> 'parent',
+				'turn'		=> 1,
 				'type'		=> ['int', 11]
 			];
 			
@@ -348,9 +356,9 @@ abstract class Model
 		return $result;
 	}
 	
-	public function setFieldsNames()
+	public function setFieldsNames($model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		$fields = $this->getFieldsNames();
 		
@@ -362,15 +370,15 @@ abstract class Model
 		return $fields;
 	}
 	
-	private function setLanguageFields($result)
+	private function setLanguageFields($result, $model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		foreach ($model::$multilang as $column)
 		{
 			foreach ($result as &$el)
 			{
-				if ($el['lang'] == \Wings::$language['id']) $el[$column] = $el['lang_' . $column];
+				if ($el['lang'] == \Wings::$language['id']) $el[$column] = $el[$column];
 				
 				if (isset($el['childrens'])) $el['childrens'] = $this->setLanguageFields($el['childrens']);
 			}
@@ -379,9 +387,9 @@ abstract class Model
 		return $result;
 	}
 	
-	private function setLanguages()
+	private function setLanguages($model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		$languages = \Wings\DB::select('Language', '`id`, `nameEn`', null, null, '`id` ASC');
 		
@@ -389,23 +397,25 @@ abstract class Model
 		
 		foreach ($model::$multilang as $column)
 		{
-			foreach ($languages as $language)
+			foreach ($languages as $i => $language)
 			{
 				$key = $column . '[' . $language['id'] . ']';
 				
 				$model::$columns[$key] = $model::$columns[$column];
 				
-				$model::$columns[$key]['key'] = $column . '[' . $language['id'] . ']';
+				$model::$columns[$key]['key'] = $key;
 				$model::$columns[$key]['name'] = $fields[$column] . ' (' . $language['nameEn'] . ')';
+				if ($model::$columns[$key]['turn'] > 9) $model::$columns[$key]['turn'] = (int)(1 . $i . $model::$columns[$key]['turn']);
+				else $model::$columns[$key]['turn'] = (int)(1 . $i . '0' . $model::$columns[$key]['turn']);
 			}
 			
 			unset($model::$columns[$column]);
 		}
 	}
 	
-	public function setWords()
+	public function setWords($model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		$query = '
 			SELECT
@@ -429,9 +439,9 @@ abstract class Model
 		$model::$words = \Wings\DB::fetchRow($query, $args);
 	}
 	
-	public function update()
+	public function update($model = null)
 	{
-		$model = $this->model;
+		if (\is_null($model)) $model = $this;
 		
 		$id = \Wings::$post['id'];
 		

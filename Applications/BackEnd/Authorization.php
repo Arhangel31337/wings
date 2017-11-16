@@ -8,8 +8,29 @@ final class Authorization
 	
 	public function index()
 	{
+		\Wings::$view['files']['css'][] = 'https://fonts.googleapis.com/css?family=Roboto:400,500,700&subset=latin,cyrillic-ext';
+		\Wings::$view['files']['css'][] = '/css/backend/reset.css';
+		\Wings::$view['files']['css'][] = '/css/backend/style.css';
+		
+		\Wings::$view['files']['js'][] = ['async' => false, 'src' => '/js/jquery.min.js'];
+		\Wings::$view['files']['js'][] = ['async' => false, 'src' => '/js/jquery-ui.min.js'];
+		\Wings::$view['files']['js'][] = ['async' => false, 'src' => '/js/BackEnd/functions.js'];
+		\Wings::$view['files']['js'][] = ['async' => false, 'src' => '/js/BackEnd/elements.js'];
+		
 		\Wings::$view['files']['js'][] = ['async' => true, 'src' => '/js/BackEnd/auth.js'];
+		
 		\Wings::$view['tpl'] = 'auth.tpl';
+		
+		\Wings::$page =
+		[
+			'documentState'		=> 'Static',
+			'pageDescription'	=> 'Авторизация Wings',
+			'pageKeywords'		=> 'Авторизация, Wings',
+			'pageTitle'			=> 'Авторизация',
+			'resourceType'		=> 'Document',
+			'revisit'			=> '30 days',
+			'robots'			=> 'INDEX,NOFOLLOW'
+		];
 	}
 	
 	public function checkLogin()

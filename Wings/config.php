@@ -26,7 +26,7 @@ return [
 	],
 	'debug'		=>
 	[
-		'autoload'	=> true,
+		'autoload'	=> false,
 		'exception'	=> true,
 		'excType'	=> 'Web',
 		'smarty'	=> false
@@ -43,7 +43,7 @@ return [
 		'name'			=>
 		[
 			'Author'		=> 'Алексей aka Arhangel31337 Коломиец',
-			'Copyright'		=> '© 2010-' . \date('Y') . ' Arhangel31337',
+			'Copyright'		=> '©2010-' . \date('Y') . ' Arhangel31337',
 			'SKYPE_TOOLBAR'	=> 'SKYPE_TOOLBAR_PARSER_COMPATIBLE'
 		]
 	],

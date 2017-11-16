@@ -7,85 +7,117 @@ final class Group extends Controller
 	function __construct()
 	{
 		$this->model = new \Applications\Models\Group();
-		
-		$this->model->setWords();
-		
-		parent::__construct();
-		
-		$this->view = new View();
 	}
 	
-	public function add()
+	public function add($data)
 	{
-		if ($this->issetAllData($this->model->columns) && $this->validate($this->model->columns))
+		if ($this->issetAllData($this->model::$columns) && $this->validate($this->model::$columns))
 		{
-			$this->model->insert();
+			$id = $this->model->insert();
 			
-			$this->backToList();
+			return self::json([
+				'code'			=> 200,
+				'description'	=> $id
+			]);
 		}
 		
 		$group = $this->model->prepareModel();
 		
 		$group =
 		[
-			'name'		=> $this->model->words['add'],
-			'columns'	=> $this->model->columns,
-			'values'	=> $group
+			'code'	=> 200,
+			'data'	=>
+			[
+				'columns'	=> $this->model::$columns,
+				'name'		=> $this->model::$words['add'],
+				'type'		=> 'form'
+			]
 		];
 		
-		$this->view->add($group);
+		self::json($group);
 	}
 	
 	public function change($id)
 	{
-		if ($this->issetAllData($this->model->columns) && $this->validate($this->model->columns))
+		if (self::issetAllData($this->model::$columns) && self::validate($this->model::$columns))
 		{
 			$this->model->update();
 			
-			$this->backToItem();
+			self::json([
+				'code'			=> 200,
+				'description'	=> ''
+			]);
 		}
-		
-		$group = $this->model->getByID($id);
-		
-		$group =
-		[
-			'name'		=> $this->model->words['change'],
-			'columns'	=> $this->model->columns,
-			'values'	=> $group
-		];
-		
-		$this->view->change($group);
+		else
+		{
+			self::json([
+				'code'			=> 500,
+				'description'	=> 'Не хватает данных.'
+			]);
+		}
 	}
 	
-	public function index()
+	public function index($data)
 	{
 		$groups = $this->model->getAll();
 		
 		$groups =
 		[
-			'name'		=> $this->model->words['list'],
-			'columns'	=> $this->model->columns,
-			'items'		=> $groups
+			'code'	=> 200,
+			'data'	=>
+			[
+				'columns'	=> $this->model::$columns,
+				'items'		=> $groups,
+				'name'		=> $this->model::$words['list'],
+				'type'		=> $this->model::$type
+			]
 		];
 		
-		return \Applications\Ajax\Controller::json($groups);
-		//$this->view->tree($groups);
+		self::json($groups);
 	}
 	
-	public function item($id)
+	public function item($data)
 	{
-		$group = $this->model->getByID($id);
+		if (!isset($data['id']))
+		{
+			return self::json([
+				'code'			=> 500,
+				'description'	=> 'Не хватает данных.'
+			]);
+		}
 		
-		$name = $group['name'];
-		unset($group['name']);
+		$language = $this->model->getByID($data['id']);
 		
-		$group =
+		$language =
 		[
-			'name'		=> $this->model->words['item'] . ' "' . $name . '"',
-			'columns'	=> $this->model->columns,
-			'item'		=> $group
+			'code'	=> 200,
+			'data'	=>
+			[
+				'columns'	=> $this->model::$columns,
+				'item'		=> $language,
+				'name'		=> $this->model::$words['item'] . ' "' . $language['name'] . '"',
+				'type'		=> 'form'
+			]
 		];
 		
-		$this->view->item($group);
+		self::json($language);
+	}
+	
+	public function remove($data)
+	{
+		if (!isset(\Wings::$post['ids']) || empty(\Wings::$post['ids']))
+		{
+			return self::json([
+				'code'			=> 500,
+				'description'	=> 'Не хватает данных.'
+			]);
+		}
+		
+		foreach (\Wings::$post['ids'] as $id) $this->model->delete($id);
+		
+		self::json([
+			'code'			=> 200,
+			'description'	=> ''
+		]);
 	}
 }

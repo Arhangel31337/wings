@@ -33,33 +33,18 @@
 	<meta name="Robots" content="{$page.robots}" />
 {/if}
 	
-    {if isset($page.pageTitle)}<title>{$page.pageTitle}</title>{/if}
-	
-	<link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="/css/backend/reset.css" />
-    <link rel="stylesheet" type="text/css" href="/css/backend/style.css" />
-	
-{foreach from=$files.css item=css}
-	<link rel="stylesheet" type="text/css" href="{$css}" />
-{/foreach}
-<!--[if lt IE 9]>
-	<script "text/javascript" src="/js/jquery.min.1.11.1.js"></script>
-	<script src="/js/html5.js"></script>
-	
-	<link rel="stylesheet" type="text/css" href="/css/style-ie7.css" />
-<![endif]-->
-{if !isset($isFullScreen) || !$isFullScreen}
-<!--[if (gt IE 8)><!-->
-	<script type="text/javascript" src="/js/jquery.min.js"></script>
-<!--<![endif]-->
+{if isset($page.pageTitle)}
+	<title>{$page.pageTitle}</title>
 {/if}
-	<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
-	
-	<script type="text/javascript" src="/js/BackEnd/functions.js"></script>
-	<script type="text/javascript" src="/js/BackEnd/elements.js"></script>
-	
-{foreach from=$files.js item=js}
-	<script {if $js.async}async {/if}type="text/javascript" src="{$js.src}"></script>
-{/foreach}
+{if isset($files.css) && !empty($files.css)}	
+	{foreach from=$files.css item=css}
+<link rel="stylesheet" type="text/css" href="{$css}" />
+	{/foreach}
+{/if}
+{if isset($files.js) && !empty($files.css)}	
+	{foreach from=$files.js item=js}
+<script type="text/javascript" src="{$js.src}"{if $js.async} async{/if}></script>
+	{/foreach}
+{/if}
 	
 </head>

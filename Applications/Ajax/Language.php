@@ -7,21 +7,13 @@ final class Language extends Controller
 	public function __construct()
 	{
 		$this->model = new \Applications\Models\Language();
-		$this->model->model = $this->model;
-		$this->model->setWords();
 	}
 	
-	public function add($data, $accesses)
+	public function add($data)
 	{
-		$access = self::checkAccess($accesses, 'update');
-		
-		if ($access !== true) return self::json($access);
-		
-		$model = $this->model;
-		
-		if ($this->issetAllData($model::$columns) && $this->validate($model::$columns))
+		if ($this->issetAllData($this->model::$columns) && $this->validate($this->model::$columns))
 		{
-			$id = $this->model->insert($model::$columns, $data);
+			$id = $this->model->insert();
 			
 			return self::json([
 				'code'			=> 200,
@@ -36,8 +28,8 @@ final class Language extends Controller
 			'code'	=> 200,
 			'data'	=>
 			[
-				'columns'	=> $model::$columns,
-				'name'		=> $model::$words['item'] . ' "Новый"',
+				'columns'	=> $this->model::$columns,
+				'name'		=> $this->model::$words['add'],
 				'type'		=> 'form'
 			]
 		];
@@ -45,14 +37,28 @@ final class Language extends Controller
 		self::json($language);
 	}
 	
-	public function index($data, $accesses)
+	public function change($id)
 	{
-		$access = self::checkAccess($accesses, 'select');
-		
-		if ($access !== true) return self::json($access);
-		
-		$model = $this->model;
-		
+		if (self::issetAllData($this->model::$columns) && self::validate($this->model::$columns))
+		{
+			$this->model->update();
+			
+			self::json([
+				'code'			=> 200,
+				'description'	=> ''
+			]);
+		}
+		else 
+		{
+			self::json([
+				'code'			=> 500,
+				'description'	=> 'Не хватает данных.'
+			]);
+		}
+	}
+	
+	public function index($data)
+	{
 		$languages = $this->model->getAll();
 		
 		$languages =
@@ -60,34 +66,18 @@ final class Language extends Controller
 			'code'	=> 200,
 			'data'	=>
 			[
-				'columns'	=> $model::$columns,
+				'columns'	=> $this->model::$columns,
 				'items'		=> $languages,
-				'name'		=> $model::$words['list'],
-				'type'		=> $model::$type
+				'name'		=> $this->model::$words['list'],
+				'type'		=> $this->model::$type
 			]
 		];
 		
 		self::json($languages);
 	}
 	
-	public function item($data, $accesses)
+	public function item($data)
 	{
-		$access = self::checkAccess($accesses, 'update');
-		
-		if ($access !== true) return self::json($access);
-		
-		$model = $this->model;
-		
-		if ($this->issetAllData($model::$columns) && $this->validate($model::$columns))
-		{
-			$this->model->update($model::$columns, \Wings::$post);
-				
-			return self::json([
-				'code'			=> 200,
-				'description'	=> ''
-			]);
-		}
-		
 		if (!isset($data['id']))
 		{
 			return self::json([
@@ -103,9 +93,9 @@ final class Language extends Controller
 			'code'	=> 200,
 			'data'	=>
 			[
-				'columns'	=> $model::$columns,
-				'name'		=> $model::$words['item'] . ' "' . $language['name'] . '"',
+				'columns'	=> $this->model::$columns,
 				'item'		=> $language,
+				'name'		=> $this->model::$words['item'] . ' "' . $language['name'] . '"',
 				'type'		=> 'form'
 			]
 		];
@@ -113,14 +103,8 @@ final class Language extends Controller
 		self::json($language);
 	}
 	
-	public function remove($data, $accesses)
+	public function remove($data)
 	{
-		$access = self::checkAccess($accesses, 'delete');
-		
-		if ($access !== true) return self::json($access);
-		
-		$model = $this->model;
-		
 		if (!isset(\Wings::$post['ids']) || empty(\Wings::$post['ids']))
 		{
 			return self::json([
@@ -131,7 +115,7 @@ final class Language extends Controller
 		
 		foreach (\Wings::$post['ids'] as $id) $this->model->delete($id);
 		
-		return self::json([
+		self::json([
 			'code'			=> 200,
 			'description'	=> ''
 		]);

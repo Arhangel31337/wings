@@ -59,7 +59,7 @@ input[type=submit] {
 	box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
 	color: #FFFFFF;
 	cursor: pointer;
-	margin: 0px 2px 4px;
+	margin: 0px 0px 4px;
 	padding: 8px 16px;
 	text-transform: uppercase;
 }
@@ -74,6 +74,7 @@ input[type=password] {
 	border-color: #E0E0E0;
 	border-style: solid;
 	border-width: 0px 0px 1px;
+	margin-bottom: 1px;
 	padding: 4px 0;
 	width: 100%;
 }
@@ -81,6 +82,7 @@ input[type=password] {
 input[type=text]:focus,
 input[type=password]:focus {
 	border-bottom: 2px solid #2196F3;
+	margin-bottom: 0px;
 }
 
 input[type=text][disabled],
@@ -89,14 +91,16 @@ input[type=password][disabled] {
 	border-color: transparent;
 }
 
-input[type=text].multiselect,
-input[type=password].multiselect {
+span.multiselect,
+span.multiselect {
 	color: #000000;
 	cursor: pointer;
+	min-height: 20px;
+	min-width: 20px;
 }
 
-input[type=text].multiselect:hover,
-input[type=password].multiselect:hover {
+span.multiselect:hover,
+span.multiselect:hover {
 	color: #2196F3;
 }
 
@@ -383,7 +387,7 @@ label {
 }
 
 .input {
-	height: 48px;
+	margin-bottom: 12px;
 }
 
 .input .inputExtra {
@@ -468,6 +472,15 @@ aside .icon {
 	min-height: 48px;
 	padding-left: 32px;
 	padding-top: 10px;
+	white-space: nowrap;
+}
+
+.icon.down,
+.icon.down.active,
+.icon.up,
+.icon.up.active {
+	margin-right: 0;
+	position: absolute;
 }
 
 .icon.add {
@@ -732,9 +745,11 @@ aside nav ul ul {
 }
 
 body > section {
+	box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
 	height: 100%;
-	position: absolute;
+	margin-left: 256px;
 	overflow: hidden;
+	position: absolute;
 }
 
 body > section > article {
@@ -748,7 +763,7 @@ body > section > article {
 }
 
 article.page1 {
-	margin-left: 256px;
+	margin-left: 0px;
 	z-index: 100;
 }
 
@@ -843,6 +858,51 @@ table th .icon {
 	margin-right: 8px;
 	margin-top: 2px;
 	width: 24px;
+}
+
+ul.tree {
+	margin-left: 23px;
+}
+
+ul.tree ul.tree {
+	margin-left: 0px;
+}
+
+ul.tree li {
+	color: #000000;
+	cursor: pointer;
+	margin-left: 24px;
+	padding-bottom: 5px;
+	padding-top: 5px;
+}
+
+ul.tree li.selected {
+	color: #2198F3;
+}
+
+ul.tree li .arrow {
+	display: block;
+	height: 24px;
+	margin-left: -24px;
+	margin-top: 1px;
+	position: absolute;
+	width: 24px;
+}
+
+a.arrow.down {
+	background-image: url(/images/backend/icons/keyboard_arrow_down.png);
+}
+
+a.arrow.left {
+	background-image: url(/images/backend/icons/keyboard_arrow_left.png);
+}
+
+a.arrow.right {
+	background-image: url(/images/backend/icons/keyboard_arrow_right.png);
+}
+
+a.arrow.up {
+	background-image: url(/images/backend/icons/keyboard_arrow_up.png);
 }
 
 form {

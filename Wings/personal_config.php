@@ -6,10 +6,10 @@ return
 	[
 		[
 			'type'		=> 'mysql',
-			'host'		=> 'localhost',
+			'host'		=> '127.0.0.1',
 			'name'		=> 'wings',
 			'login'		=> 'root',
-			'password'	=> '',
+			'password'	=> '14a86r35h',
 			'charset'	=> 'UTF8'
 		]
 	],
