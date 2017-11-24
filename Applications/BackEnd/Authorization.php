@@ -63,7 +63,9 @@ final class Authorization
 			];
 		}
 		
-		return \Applications\Ajax\Controller::json($result);
+		$view = new \Applications\Ajax\View();
+		
+		return $view->json($result);
 	}
 	
 	public function checkPassword()
@@ -101,6 +103,8 @@ final class Authorization
 			];
 		}
 		
-		return \Applications\Ajax\Controller::json($result);
+		$view = new \Applications\Ajax\View();
+		
+		return $view->json($result);
 	}
 }

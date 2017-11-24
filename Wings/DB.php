@@ -156,7 +156,14 @@ final class DB
 		$statement = self::Query($query, $args);
 		$result = [];
 		
-		while ($value = $statement->fetchColumn($column)) $result[] = $value;
+		$value = $statement->fetchColumn($column);
+		
+		while ($value)
+		{
+			$result[] = $value;
+			
+			$value = $statement->fetchColumn($column);
+		}
 		
 		return $result;
 	}

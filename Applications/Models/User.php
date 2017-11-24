@@ -16,7 +16,8 @@ final class User extends Model
 		'created'	=>
 		[
 			'default'	=> 'now',
-			'field'		=> 'string',
+			'field'		=> 'datetime',
+			'isNFormF'	=> true,
 			'generated'	=> true,
 			'turn'		=> 6,
 			'type'		=> ['str', 19]
@@ -31,7 +32,8 @@ final class User extends Model
 		'lastVisit'	=>
 		[
 			'default'	=> 'now',
-			'field'		=> 'string',
+			'field'		=> 'datetime',
+			'isNFormF'	=> true,
 			'generated'	=> true,
 			'turn'		=> 7,
 			'type'		=> ['str', 19]

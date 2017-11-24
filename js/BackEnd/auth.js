@@ -33,8 +33,8 @@ $(document).ready(function() {
 						
 						checkPassword();
 						
-						$('#login').hide(500);
-						$('#password').show(500, function() {
+						$('#login').stop(true, true).hide(500);
+						$('#password').stop(true, true).show(500, function() {
 							$('input[name=password]').focus();
 							var temp = $('input[name=password]').val();
 							$('input[name=password]').val('');
@@ -43,7 +43,7 @@ $(document).ready(function() {
 					}
 					else
 					{
-						$('input[name=mail]').errorShow(json.description);
+						$('input[name=mail]').inputError('show', json.description);
 					}
 				}
 				
@@ -51,7 +51,7 @@ $(document).ready(function() {
 			},
 			error		: function(jqXHR, textStatus, errorThrown)
 			{
-				$('input[name=mail]').errorShow('Ошибка соединения с сервером.');
+				$('input[name=mail]').inputError('show', 'Ошибка соединения с сервером.');
 				
 				$('.background').css('display', 'none');
 			}
@@ -61,8 +61,8 @@ $(document).ready(function() {
 	$('input[name=back]').click(function(e) {
 		checkLogin(true);
 		
-		$('#password').hide(500);
-		$('#login').show(500, function() {
+		$('#password').stop(true, true).hide(500);
+		$('#login').stop(true, true).show(500, function() {
 			$('input[name=mail]').focus();
 			var temp = $('input[name=mail]').val();
 			$('input[name=mail]').val('');
@@ -91,14 +91,14 @@ $(document).ready(function() {
 				if (json.code !== undefined)
 				{
 					if (json.code === 200) location.reload();
-					else $('input[name=password]').errorShow(json.description); 
+					else $('input[name=password]').inputError('show', json.description); 
 				}
 				
 				$('.background').css('display', 'none');
 			},
 			error		: function(jqXHR, textStatus, errorThrown)
 			{
-				$('input[name=password]').errorShow('Ошибка соединения с сервером.');
+				$('input[name=password]').inputError('show', 'Ошибка соединения с сервером.');
 				
 				$('.background').css('display', 'none');
 			}
@@ -127,12 +127,12 @@ function checkLogin(errorDisplay) {
 	{
 		button.prop('disabled', true);
 		
-		if (errorDisplay) input.errorShow('Поле не должно быть пустым.');
+		if (errorDisplay) input.inputError('show', 'Поле не должно быть пустым.');
 	}
 	else
 	{
 		button.prop('disabled', false);
-		input.errorHide();
+		input.inputError('hide');
 	}
 	
 	$('.background .progress').blockInCenter();
@@ -148,12 +148,12 @@ function checkPassword(errorDisplay) {
 	{
 		button.prop('disabled', true);
 		
-		if (errorDisplay) input.errorShow('Поле не должно быть пустым.');
+		if (errorDisplay) input.inputError('show', 'Поле не должно быть пустым.');
 	}
 	else
 	{
 		button.prop('disabled', false);
-		input.errorHide(500);
+		input.inputError('hide');
 	}
 	
 	$('.background .progress').blockInCenter();

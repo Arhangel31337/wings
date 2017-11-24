@@ -140,14 +140,21 @@ abstract class Model
 			$columns[] = '`Language`.`code` AS `code`';
 			$columns[] = '`Language`.`nameEn` AS `nameEn`';
 			
-			foreach ($model::$multilang as $field) $columns[] = '`lang_' . $model::$table . '`.`' . $field . '` AS `' . $field . '`';
+			foreach ($model::$multilang as $field) $columns[] = 'IFNULL(`lang_' . $model::$table . '`.`' . $field . '`, "") AS `' . $field . '`';
 			
-			$join = 'INNER JOIN `lang_' . $model::$table . '` ON `' . $model::$table . '`.`id` = `lang_' . $model::$table . '`.`' . lcfirst($model::$table) . '`';
+			$join = 'LEFT OUTER JOIN `lang_' . $model::$table . '` ON `' .
+				$model::$table . '`.`id` = `lang_' . $model::$table . '`.`' . lcfirst($model::$table) . '` AND ' .
+				'`lang_' . $model::$table . '`.`lang` = `Language`.`id`';
 			
-			if ($isList) $join .= ' AND `lang_' . $model::$table . '`.`lang` = ' . \Wings::$language['id'];
+			if ($isList)
+			{
+				$join = 'INNER JOIN `lang_' . $model::$table . '` ON `' .
+					$model::$table . '`.`id` = `lang_' . $model::$table . '`.`' . lcfirst($model::$table) . '` AND ' .
+					'`lang_' . $model::$table . '`.`lang` = `Language`.`id` AND `lang_' . $model::$table . '`.`lang` = ' . \Wings::$language['id'];
+			}
 			
+			$joins[] = 'INNER JOIN `Language`';
 			$joins[] = $join;
-			$joins[] = 'INNER JOIN `Language` ON `lang_' . $model::$table . '`.`lang` = `Language`.`id`';
 		}
 		
 		return [\implode(', ', $columns), \implode(' ', $joins)];
@@ -165,14 +172,21 @@ abstract class Model
 			SELECT
 				f.`name`,
     			lf.`name` AS `value`
-			FROM `Field` f
+			FROM `Table` t
+			INNER JOIN `Field` f ON t.`id` = f.`table`
 			INNER JOIN `lang_Field` lf ON
+				t.`name` = :table AND
 				f.`id` = lf.`field` AND
-			    lf.`lang` = ' . \Wings::$language['id'] . '
+			    lf.`lang` = :lang
 			WHERE f.`name` IN (' . $fields . ');
 		';
+		$args =
+		[
+			'lang'	=> [\Wings::$language['id'], 'int', 2],
+			'table'	=> [$model::$table, 'str', 63]
+		];
 		
-		$result = \Wings\DB::fetchAll($query);
+		$result = \Wings\DB::fetchAll($query, $args);
 		
 		$fields = [];
 		
@@ -229,28 +243,32 @@ abstract class Model
 		{
 			if (isset($column['generated']) && $column['generated'] === true && !isset($column['default'])) continue;
 			if (in_array($key, $model::$multilang)) continue;
+			if (in_array(\ucfirst($key), $model::$links)) continue;
 			
 			if (isset($column['default']))
 			{
 				switch ($column['default'])
 				{
 					case 'now':
-						$args[$key] = [\date('Y-m-d H:i:s'), $column['type'][0], $column['type'][1]];
+						$value = \date('Y-m-d H:i:s');
 						break;
 					default:
-						$args[$key] = [$column['default'], $column['type'][0], $column['type'][1]];
+						$value = $column['default'];
 						break;
 				}
 			}
 			else
 			{
-				if ($column['field'] === 'checkbox')
+				if ($column['field'] === 'checkbox' || $column['field'] === 'switch')
 				{
-					if (isset(\Wings::$post[$key])) $args[$key] = [1, $column['type'][0], $column['type'][1]];
-					else $args[$key] = [0, $column['type'][0], $column['type'][1]];
+					if (isset(\Wings::$post[$key])) $value = 1;
+					else $value = 0;
 				}
-				else $args[$key] = [\Wings::$post[$key], $column['type'][0], $column['type'][1]];
+				elseif ($column['field'] === 'password') $value = \Wings\User::createPassword(\Wings::$post['mail'], \Wings::$post['password'])[0];
+				else $value = \Wings::$post[$key];
 			}
+			
+			$args[$key] = [$value, $column['type'][0], $column['type'][1]];
 		}
 		
 		if (!empty($model::$tree)) $id = \Wings\Tree\NestedSets::insertNode($model::$table, \Wings::$post['parent'], $args);
@@ -451,8 +469,22 @@ abstract class Model
 		{
 			if (isset($column['generated']) && $column['generated'] === true) continue;
 			if (in_array($key, $model::$multilang)) continue;
+			if (in_array(\ucfirst($key), $model::$links)) continue;
 			
-			$args[$key] = [\Wings::$post[$key], $column['type'][0], $column['type'][1]];
+			if ($column['field'] === 'checkbox' || $column['field'] === 'switch')
+			{
+				if (isset(\Wings::$post[$key])) $value = 1;
+				else $value = 0;
+			}
+			elseif ($column['field'] === 'password')
+			{
+				if (empty(\Wings::$post[$key])) continue;
+				
+				$value = \Wings\User::createPassword(\Wings::$post['mail'], \Wings::$post[$key])[0];
+			}
+			else $value = \Wings::$post[$key];
+			
+			$args[$key] = [$value, $column['type'][0], $column['type'][1]];
 		}
 		
 		if (\count($args) > 0)
@@ -500,6 +532,8 @@ abstract class Model
 				$table = 'link_' . $model::$table . $link;
 				
 				\Wings\DB::delete($table, [$arg1 => '='], [$arg1 => [$id, 'int', 11]]);
+				
+				if (empty(\Wings::$post[$arg2])) continue;
 				
 				foreach (\Wings::$post[$arg2] as $value)
 				{

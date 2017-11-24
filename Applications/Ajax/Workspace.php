@@ -6,6 +6,8 @@ final class Workspace
 {
 	public static function initialize()
 	{
+		$view = new View();
+		
 		if (\Wings::$user->getIsActive() != 1)
 		{
 			$data =
@@ -14,12 +16,12 @@ final class Workspace
 				'description'	=> 'Необходимо авторизоваться.'
 			];
 			
-			return Controller::json($data);
+			return $view->json($data);
 		}
 		
-		$method = 'index';
+		$method = 'list';
 		
-		if (isset(\Wings::$pathname[1]) && \Wings::$pathname[1] !== 'list')  $method = \Wings::$pathname[1];
+		if (isset(\Wings::$pathname[1]))  $method = \Wings::$pathname[1];
 		
 		$mvc = \Wings::$workspace['namespace'] . \ucfirst(\Wings::$pathname[0]);
 		
@@ -48,7 +50,7 @@ final class Workspace
 				break;
 		}
 		
-		if ($access !== true) return \Applications\Ajax\Controller::json($access);
+		if ($access !== true) return $view->json($access);
 		
 		$mvc = new $mvc();
 		

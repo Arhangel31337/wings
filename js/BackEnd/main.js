@@ -45,10 +45,10 @@ $(document).ready(function() {
 		{
 			if (ul.css('display') === 'none')
 			{
-				$('nav ul ul').hide(500);
-				ul.show(500);
+				$('nav ul ul').stop(true, true).hide(500);
+				ul.stop(true, true).show(500);
 			}
-			else ul.hide(500);
+			else ul.stop(true, true).hide(500);
 		}
 		else
 		{
@@ -121,6 +121,15 @@ $(document).ready(function() {
 			pages[path[i][0]].args[path[i][3][j][0]] = path[i][3][j][1];
 		}
 	}
+	
+	if (path[0][1] != undefined)
+	{
+		var navItem = $('nav a[page="1;' + path[0][1] + ';' + path[0][2] + '"]');
+		
+		navItem.addClass('active');
+		
+		navItem.parents('ul').css('display', 'block');
+	}
 });
 
 $(window).load(function() {
@@ -174,11 +183,11 @@ function pageHide(pageNumber, changePage)
 	{
 		var prevPage = $('article[page=' + (pageNumber - 1) + ']');
 		var prevMenu =  prevPage.find('.menu');
-		prevMenu.find('.icon span').show(500);
-		prevMenu.find('.icon.fl-r').first().animate({marginRight : 0}, 500);
+		prevMenu.find('.icon span').stop(true, true).show(500);
+		prevMenu.find('.icon.fl-r').first().animateNew({marginRight : 0});
 		prevPage.find('.selected').removeClass('selected');
 		
-		$('article[page=' + pageNumber + ']').animate({marginLeft : '110%'}, 500);
+		$('article[page=' + pageNumber + ']').animate({marginLeft : '110%'});
 		
 		if (changePage)
 		{
@@ -218,9 +227,9 @@ function pageShow(pageNumber, reverse = 1, changePage = false)
 		var marginRight = ((dividend - i) / (dividend - i + 1) * 100) + '%';
 		
 		var prevMenu = $('article[page=' + i + '] .menu');
-		prevMenu.find('.icon span').hide(500);
-		$('article[page=' + (i + 1) + ']').animate({width : width, marginLeft : marginLeft}, 500);
-		prevMenu.find('.icon.fl-r').first().animate({marginRight : marginRight}, 500);
+		prevMenu.find('.icon span').stop(true, true).hide(500);
+		$('article[page=' + (i + 1) + ']').animateNew({width : width, marginLeft : marginLeft});
+		prevMenu.find('.icon.fl-r').first().animateNew({marginRight : marginRight});
 	}
 	
 	for (pageNumber++; pageNumber <= pages.length; pageNumber++) pageHide(pageNumber, changePage);

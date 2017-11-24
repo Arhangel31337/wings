@@ -5,52 +5,127 @@ namespace Applications\Ajax;
 class Controller extends \Applications\Controller
 {
 	protected $model;
-	protected static $view;
+	protected $view;
 	
-	public static function csv($data)
+	public function __construct()
 	{
-		self::$view = new View();
+		$calledClass = \str_replace(__NAMESPACE__ . '\\', '', get_called_class());
+		$modelClass = '\\Applications\\Models\\' . $calledClass;
 		
-		$strings = [];
-		
-		foreach ($data as $string)
+		$this->model = new $modelClass();
+		$this->view = new View();
+	}
+	
+	public function add($data)
+	{
+		if ($this->issetAllData($this->model::$columns) && $this->validate($this->model::$columns))
 		{
-			$rows = [];
+			$id = $this->model->insert();
 			
-			foreach ($string as $row) $rows[] = $row;
-			
-			$strings[] = \implode(';', $rows);
+			return $this->view->json([
+				'code'			=> 200,
+				'description'	=> $id
+			]);
 		}
 		
-		self::$view->json(\implode("\n", $strings));
-	}
-	
-	public static function html($file, $data)
-	{
-		self::$view = new View();
-		self::$view->html($file, $data);
-	}
-	
-	public static function json($data)
-	{
-		self::$view = new View();
-		self::$view->json(json_encode($data));
-	}
-	
-	public static function text($data)
-	{
-		self::$view = new View();
-		self::$view->json($data);
-	}
-	
-	public static function xml($data)
-	{
-		$xml = new \SimpleXMLElement('<?xml version="1.0" encoding="utf-8"?><data />');
+		$item = $this->model->prepareModel();
 		
-		arrayToXML($data, $xml);
+		$item =
+		[
+			'code'	=> 200,
+			'data'	=>
+			[
+				'columns'	=> $this->model::$columns,
+				'name'		=> $this->model::$words['add'],
+				'type'		=> 'form'
+			]
+		];
 		
-		self::$view = new View();
-		self::$view->xml($xml->asXML());
+		$this->view->json($item);
+	}
+	
+	public function change($id)
+	{
+		if (self::issetAllData($this->model::$columns) && self::validate($this->model::$columns))
+		{
+			$this->model->update();
+			
+			$this->view->json([
+				'code'			=> 200,
+				'description'	=> ''
+			]);
+		}
+		else
+		{
+			$this->view->json([
+				'code'			=> 500,
+				'description'	=> 'Не хватает данных.'
+			]);
+		}
+	}
+	
+	public function item($data)
+	{
+		if (!isset($data['id']))
+		{
+			return $this->view->json([
+				'code'			=> 500,
+				'description'	=> 'Не хватает данных.'
+			]);
+		}
+		
+		$item = $this->model->getByID($data['id']);
+		
+		$item =
+		[
+			'code'	=> 200,
+			'data'	=>
+			[
+				'columns'	=> $this->model::$columns,
+				'item'		=> $item,
+				'name'		=> $this->model::$words['item'],
+				'type'		=> 'form'
+			]
+		];
+		
+		$this->view->json($item);
+	}
+	
+	public function list($data)
+	{
+		$items = $this->model->getAll();
+		
+		$items =
+		[
+			'code'	=> 200,
+			'data'	=>
+			[
+				'columns'	=> $this->model::$columns,
+				'items'		=> $items,
+				'name'		=> $this->model::$words['list'],
+				'type'		=> $this->model::$type
+			]
+		];
+		
+		$this->view->json($items);
+	}
+	
+	public function remove($data)
+	{
+		if (!isset(\Wings::$post['ids']) || empty(\Wings::$post['ids']))
+		{
+			return $this->view->json([
+				'code'			=> 500,
+				'description'	=> 'Не хватает данных.'
+			]);
+		}
+		
+		foreach (\Wings::$post['ids'] as $id) $this->model->delete($id);
+		
+		$this->view->json([
+			'code'			=> 200,
+			'description'	=> ''
+		]);
 	}
 }
 

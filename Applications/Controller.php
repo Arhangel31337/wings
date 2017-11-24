@@ -22,7 +22,7 @@ class Controller
 		foreach ($columns as $key => $value)
 		{
 			if (isset($value['generated']) && $value['generated'] === true && !isset($field['field']['isConfirm'])) continue;
-			if ($value['field'] === 'checkbox') continue;
+			if ($value['field'] === 'checkbox' || $value['field'] === 'switch') continue;
 			
 			if (isset(\Wings::$post[$key])) continue;
 			else return false;

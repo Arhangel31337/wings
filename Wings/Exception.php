@@ -78,13 +78,33 @@ class Exception extends \Exception
     
     private static function report($methodName)
     {
-        if (self::$debug) self::$methodName();
+    	if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') self::reportAJAX();
+        elseif (self::$debug) self::$methodName();
+        
         self::Clear();
+    }
+    
+    private static function reportAJAX()
+    {
+    	\header('Content-type: application/json; charset=UTF-8');
+    	
+    	$data =
+    	[
+    		'type'		=> self::$errorName[self::$errorNumber],
+    		'file'		=> self::$errorFile,
+    		'line'		=> self::$errorLine,
+    		'message'	=> self::$errorMessage
+    	];
+    	
+    	if (!empty(self::$errorTrace) && self::$errorTrace[0]['function'] != 'RegisterShutdownFunction') $data['trace'] = self::$errorTrace;
+    	
+    	echo \json_encode($data);
+    	
+    	exit();
     }
     
     private static function reportWeb()
     {
-    	$thisDir = '/Wings/Exception/';
         require \Wings::$dir . '/Exception/index.php';
         exit();
     }

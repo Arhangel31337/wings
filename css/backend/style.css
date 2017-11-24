@@ -64,6 +64,13 @@ input[type=submit] {
 	text-transform: uppercase;
 }
 
+input.reverse[type=button],
+input.reverse[type=submit] {
+	background-color: #FFFFFF;
+	box-shadow: none;
+	color: #2196F3;
+}
+
 input[type=button][disabled],
 input[type=submit][disabled] {
 	background-color: #E0E0E0;
@@ -85,13 +92,25 @@ input[type=password]:focus {
 	margin-bottom: 0px;
 }
 
+input[type=text]:focus:hover,
+input[type=password]:focus:hover {
+	border-bottom: 2px solid #2196F3;
+	margin-bottom: 0px;
+}
+
+input[type=text]:hover,
+input[type=password]:hover {
+	border-bottom: 2px solid #A8A8A8;
+	margin-bottom: 0px;
+}
+
 input[type=text][disabled],
 input[type=password][disabled] {
 	background: none;
 	border-color: transparent;
 }
 
-span.multiselect,
+span.datetime,
 span.multiselect {
 	color: #000000;
 	cursor: pointer;
@@ -99,9 +118,19 @@ span.multiselect {
 	min-width: 20px;
 }
 
-span.multiselect:hover,
+span.datetime:hover,
 span.multiselect:hover {
 	color: #2196F3;
+}
+
+span.datetime.from:before {
+	content: "c ";
+	color: #000000;
+}
+
+span.datetime.to:before {
+	content: " по ";
+	color: #000000;
 }
 
 label {
@@ -389,9 +418,20 @@ label {
 .input {
 	margin-bottom: 12px;
 }
+.input label.switch {
+	display: block;
+}
+
+.input label.inputName {
+	color: rgba(0, 0, 0, 0.6);
+	display: block;
+	height: 20px;
+	font-size: 12px;
+}
 
 .input .inputExtra {
-	display: none;
+	height: 0px;
+	overflow: hidden;
 }
 
 .input .inputExtra .icon {
@@ -410,6 +450,7 @@ label {
 
 .checkbox {
 	background: transparent url("/images/BackEnd/elements/check_off.png") no-repeat scroll 0px 0px;
+	cursor: pointer;
 	padding-left: 24px;
 }
 
@@ -421,15 +462,15 @@ label {
 	display: none;
 }
 
-.switch {
-	background: transparent url("/images/BackEnd/elements/switch_off.png") no-repeat scroll 0px 0px;
+span.switch {
+	background: transparent url("/images/BackEnd/elements/switch_off.png") no-repeat scroll 0px 4px;
 	float: right;
-	height: 24px;
+	height: 28px;
 	width: 36px;
 }
 
 .switch.checked {
-	background: transparent url("/images/BackEnd/elements/switch_on.png") no-repeat scroll 0px 0px;
+	background: transparent url("/images/BackEnd/elements/switch_on.png") no-repeat scroll 0px 4px;
 }
 
 .switch input {
@@ -455,6 +496,174 @@ label {
 
 .popup section article {
 	margin-bottom: 16px;
+}
+
+.datetimePicker {
+	border: none;
+	box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+	margin-top: -255px;
+	padding: 0;
+	top: 50%;
+	z-index: 1000;
+}
+
+.datetimePicker header {
+	background-color: #2196F3;
+	color: #FFFFFF;
+	font-size: 1.5em;
+	padding: 24px;
+	text-align: center;
+}
+
+.datetimePicker header output {
+	
+}
+
+.datetimePicker a.arrow {
+	display: block;
+	height: 24px;
+	margin-top: 1px;
+	width: 24px;
+}
+
+.datetimePicker .picker {
+	float: left;
+}
+
+.datetimePicker .picker {
+	padding: 0 12px;
+}
+
+.datetimePicker .picker.year .arrow {
+	margin: auto;
+}
+
+.datetimePicker .picker.year div {
+	padding: 12px;
+}
+
+.datetimePicker .picker.year .overflow {
+	height: 336px;
+	overflow-y: hidden;
+	padding: 0 12px;
+}
+
+.datetimePicker .picker.year ul {
+	position: relative;
+}
+
+.datetimePicker .picker.year li {
+	cursor: pointer;
+	height: 48px;
+	padding: 11px 0;
+	text-align: center;
+	width: 60px;
+}
+
+.datetimePicker .picker.year li.active {
+	color: #2196F3;
+	font-size: 1.25em;
+	font-weight: bold;
+}
+
+.datetimePicker .picker.months {
+	display: none;
+	opacity: 0;
+	width: 360px;
+}
+
+.datetimePicker .picker.months > div {
+	height: 48px;
+	padding-top: 12px;
+	text-align: center;
+}
+
+.datetimePicker .picker.months table {
+	
+}
+
+.datetimePicker .picker.months table tr {
+	border-top: none;
+}
+
+.datetimePicker .picker.months table tr:hover {
+	background-color: #FFFFFF;
+	border-top: none;
+}
+
+.datetimePicker .picker.months table td {
+	border: 1px solid #E3E3E3;
+	height: 84px;
+	padding: 0;
+	vertical-align: middle;
+	width: 112px;
+}
+
+.datetimePicker .picker.months table td.active {
+	color: #2196F3;
+}
+.datetimePicker .picker.months table td:hover {
+	background-color: #E3F2FD;
+}
+
+.datetimePicker .picker.calendar {
+	
+}
+
+.datetimePicker .picker.calendar .month {
+	height: 48px;
+	padding: 11px 10px;
+	text-align: center;
+}
+
+.datetimePicker .picker.calendar tr {
+	border-top: none;
+}
+
+.datetimePicker .picker.calendar tr:hover {
+	background-color: #FFFFFF;
+}
+
+.datetimePicker .picker.calendar th,
+.datetimePicker .picker.calendar td {
+	padding: 0;
+	vertical-align: middle;
+	width: 48px;
+}
+
+.datetimePicker .picker.calendar td.active {
+	color: #2196F3;
+	font-size: 1.25em;
+	font-weight: bold;
+}
+
+.datetimePicker .picker.time {
+	font-size: 3em;
+	padding: 150px 24px 0;
+}
+
+.datetimePicker .picker.time input {
+	font-size: 1em;
+	width: 54px;
+}
+
+.datetimePicker .picker.time span {
+	display: block;
+	float: left;
+	font-size: 0.25em;
+	margin-right: 34px;
+	text-align: center;
+	width: 55px;
+}
+
+.datetimePicker .picker.time span:last-child {
+	margin-right: 0;
+}
+
+.datetimePicker footer {
+	bottom: 12px;
+	position: absolute;
+	right: 36px;
 }
 
 aside {
@@ -811,12 +1020,32 @@ section > article > section .menu .icon.fl-r {
 
 section > article > section .filters {
 	display: none;
-	margin-left: 16px;
+	padding-left: 16px;
 }
 
-section > article > section .filters div {
+section > article > section .filters div.input {
+	float: left;
 	height: 48px;
-	width: 400px;
+	margin-right: 24px;
+	width: 380px;
+}
+
+section > article > section .filters label {
+	margin-left: 36px;
+}
+
+section > article > section .filters label.switch {
+	margin-left: 36px;
+	margin-top: -25px;
+	width: 344px;
+}
+
+section > article > section .filters input[type=text] {
+	width: 344px;
+}
+
+section > article > section .filters span.checkbox {
+	margin-right: 12px;
 }
 
 table {
@@ -893,16 +1122,32 @@ a.arrow.down {
 	background-image: url(/images/backend/icons/keyboard_arrow_down.png);
 }
 
+a.arrow.down:hover {
+	background-image: url(/images/backend/icons/keyboard_arrow_down_active.png);
+}
+
 a.arrow.left {
 	background-image: url(/images/backend/icons/keyboard_arrow_left.png);
+}
+
+a.arrow.left:hover {
+	background-image: url(/images/backend/icons/keyboard_arrow_left_active.png);
 }
 
 a.arrow.right {
 	background-image: url(/images/backend/icons/keyboard_arrow_right.png);
 }
 
+a.arrow.right:hover {
+	background-image: url(/images/backend/icons/keyboard_arrow_right_active.png);
+}
+
 a.arrow.up {
 	background-image: url(/images/backend/icons/keyboard_arrow_up.png);
+}
+
+a.arrow.up:hover {
+	background-image: url(/images/backend/icons/keyboard_arrow_up_active.png);
 }
 
 form {

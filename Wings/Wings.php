@@ -117,12 +117,12 @@ final class Wings
 		self::$settings = $settings['settings'];
 		self::$settings['sessionTime'] = $settings['php']['session.cookie_lifetime'];
 		
-		\Wings\Crypt::initialize($settings['crypt']);
-		\Wings\File::initialize();
-		
 		\Wings\Autoloader::$debug = $settings['debug']['autoload'];
 		\Wings\Exception::$debug = $settings['debug']['exception'];
 		\Wings\Exception::$debugType = $settings['debug']['excType'];
+		
+		\Wings\Crypt::initialize($settings['crypt']);
+		\Wings\File::initialize();
 	}
 	
 	public function setHostSettings()

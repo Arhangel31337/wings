@@ -4,7 +4,7 @@ namespace Wings;
 
 class Autoloader
 {
-	public static $debug = true;
+	public static $debug = false;
 	
 	public static function arrayFiles($filePath)
 	{
@@ -49,4 +49,4 @@ class Autoloader
 	}
 }
 
-\spl_autoload_register('\Wings\Autoloader::Autoload');
+\spl_autoload_register('\Wings\Autoloader::autoload');
