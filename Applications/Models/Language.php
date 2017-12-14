@@ -2,7 +2,7 @@
 
 namespace Applications\Models;
 
-final class Language extends Model
+final class Language extends \Wings\Model
 {
 	public	static	$columns	=
 	[

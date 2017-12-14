@@ -2,7 +2,7 @@
 
 namespace Applications\Models;
 
-final class User extends Model
+final class User extends \Wings\Model
 {
 	public	static	$columns =
 	[
@@ -72,6 +72,6 @@ final class User extends Model
 			'type'		=> ['int', 1]
 		]
 	];
-	public	static	$links	= ['Group'];
+	public	static	$links	= ['group'];
 	public	static	$table	= 'User';
 }

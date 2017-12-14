@@ -13,6 +13,7 @@ function Element(data)
 {
 	this.html;
 	
+	this.accesses = data.accesses;
 	this.columns = data.columns;
 	this.colTurn = {};
 	this.currentPage = data.currentPage
@@ -71,28 +72,30 @@ Form.prototype.createHTML = function()
 {
 	var form = this;
 	
-	if (form.item === undefined)
+	if (form.item === undefined || form.item.id === undefined)
 	{
 		var html = $(
 			'<h2>' + form.name + '</h2>' +
 			'<div class="menu">' +
-				'<div class="icon create fl-r"><span>Создать</span></div>' +
 				'<div class="cl-b"></div>' +
 			'</div>' +
 			'<form></form>'
 		);
+		
+		if (this.accesses.insert) $(html[1]).prepend('<div class="icon create fl-r"><span>Создать</span></div>');
 	}
 	else
 	{
 		var html = $(
 			'<h2>' + form.name + '</h2>' +
 			'<div class="menu">' +
-				'<div class="icon remove fl-r"><span>Удалить</span></div>' +
-				'<div class="icon save fl-r"><span>Сохранить</span></div>' +
 				'<div class="cl-b"></div>' +
 			'</div>' +
 			'<form></form>'
 		);
+		
+		if (this.accesses.update) $(html[1]).prepend('<div class="icon save fl-r"><span>Сохранить</span></div>');
+		if (this.accesses.delete) $(html[1]).prepend('<div class="icon remove fl-r"><span>Удалить</span></div>');
 	}
 	
 	var formEl = $(html[2]);
@@ -102,10 +105,10 @@ Form.prototype.createHTML = function()
 		var column = form.columns[form.turnCol[i]];
 		var input;
 		
-		if (column.generated !== undefined && column.generated === true && form.item === undefined) continue;
+		if (column.generated !== undefined && column.generated === true && form.item === undefined && form.item.id === undefined) continue;
 		if (column.isNFormF !== undefined && column.isNFormF == true)
 		{
-			if (form.item === undefined) continue;
+			if (form.item === undefined || form.item.id === undefined) continue;
 			
 			input = $('<input key="' + i + '" name="' + form.turnCol[i] + '" type="hidden" value="' + form.item[form.turnCol[i]] + '" />');
 			
@@ -116,7 +119,7 @@ Form.prototype.createHTML = function()
 		
 		var value = '';
 		
-		if (form.item !== undefined) value = form.item[form.turnCol[i]];
+		if (form.item !== undefined && form.item[form.turnCol[i]] !== undefined) value = form.item[form.turnCol[i]];
 		
 		switch(column.field)
 		{
@@ -152,7 +155,14 @@ Form.prototype.createHTML = function()
 				input = $('<input key="' + i + '" name="' + form.turnCol[i] + '" placeholder="' + column.name + '" type="password" value="" />');
 				break;
 			case 'select':
-				input = $('<input key="' + i + '" name="' + form.turnCol[i] + '" placeholder="' + column.name + '" type="text" value="' + value + '" />');
+				input = $('<select name="' + form.turnCol[i] + '"></select>');
+				
+				for (var k in value)
+				{
+					var option = $('<option value="' + value[k]['id'] + '">' + value[k]['name'] + '</option>').prop('selected', value[k]['selected']);
+					
+					input.append(option);
+				}
 				break;
 			case 'string':
 				input = $('<input key="' + i + '" name="' + form.turnCol[i] + '" placeholder="' + column.name + '" type="text" value="' + value + '" />');
@@ -162,6 +172,9 @@ Form.prototype.createHTML = function()
 							'type="checkbox" columnName="' + column.name + '" value="' + value + '" />');
 				if (value == 1) input.prop('checked', true);
 				break;
+			case 'text':
+				input = $('<textarea key="' + i + '" name="' + form.turnCol[i] + '" placeholder="' + column.name + '" type="text">' + value + '</textarea>');
+				break;
 		}
 		
 		if (column.validate !== undefined) input.attr('validate', column.validate.join(','));
@@ -169,8 +182,14 @@ Form.prototype.createHTML = function()
 		formEl.append(input);
 	}
 	
+	if (!this.accesses.update) formEl.find('input,textarea').prop('disabled', true);
+	
 	formEl.find('input[type!=hidden]').prepareInput();
 	formEl.find('span').prepareSpan();
+	formEl.find('textarea').prepareInput();
+	formEl.find('select').prepareSelect();
+	
+	autosize(formEl.find('textarea'));
 	
 	html.find('.icon.create').click(function(e) {
 		if (!formEl.checkForm()) return;
@@ -285,11 +304,10 @@ Table.prototype.createHTML = function()
 	
 	if (table.delegate === null)
 	{
-		$(html[1]).prepend(
-			'<div class="icon filter fl-l"><span>Фильтр</span></div>' +
-			'<div class="icon remove fl-r"><span>Удалить</span></div>' +
-			'<div class="icon add fl-r"><span>Добавить</span></div>'
-		);
+		$(html[1]).prepend('<div class="icon filter fl-l"><span>Фильтр</span></div>');
+		
+		if (this.accesses.insert) $(html[1]).prepend('<div class="icon add fl-r"><span>Добавить</span></div>');
+		if (this.accesses.delete) $(html[1]).prepend('<div class="icon remove fl-r"><span>Удалить</span></div>');
 	}
 	
 	var filters = $(html[2]);
@@ -308,6 +326,7 @@ Table.prototype.createHTML = function()
 				input = $('<span class="datetime fromTo" key="' + i + '" name="' + table.turnCol[i] + '" placeholder="' + column.name + '" value="">Не выбрано</span>');
 				break;
 			case 'label':
+			case 'select':
 			case 'string':
 				input = $('<input key="' + i + '" name="' + table.turnCol[i] + '" placeholder="' + column.name + '" type="text" value="" />');
 				break;

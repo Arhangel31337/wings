@@ -1,8 +1,7 @@
 <?php
-
 namespace Applications\Models;
 
-final class Group extends \Wings\Model
+final class Field extends \Wings\Model
 {
 	public	static	$columns =
 	[
@@ -14,14 +13,29 @@ final class Group extends \Wings\Model
 			'turn'		=> 1,
 			'type'		=> ['int', 3]
 		],
+		'field'	=>
+		[
+			'field'		=> 'string',
+			'style'		=> ['align'	=> 'left'],
+			'turn'		=> 3,
+			'type'		=> ['str', 255]
+		],
 		'name'	=>
 		[
 			'field'		=> 'string',
+			'style'		=> ['align'	=> 'left'],
+			'turn'		=> 4,
+			'type'		=> ['str', 255]
+		],
+		'table'	=>
+		[
+			'field'		=> 'select',
 			'style'		=> ['align'	=> 'left'],
 			'turn'		=> 2,
 			'type'		=> ['str', 255]
 		]
 	];
+	public	static	$link	= ['table'];
 	public	static	$multilang	= ['name'];
-	public	static	$table		= 'Group';
+	public	static	$table		= 'Field';
 }

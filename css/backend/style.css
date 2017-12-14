@@ -110,6 +110,44 @@ input[type=password][disabled] {
 	border-color: transparent;
 }
 
+select {
+	width: 100%;
+}
+
+textarea {
+	border-color: #E0E0E0;
+	border-style: solid;
+	border-width: 0px 0px 1px;
+	overflow-y: hidden !important;
+	padding-bottom: 4px;
+	resize: none;
+	width: 100%;
+}
+
+textarea:disabled {
+	background-color: #FFFFFF;
+}
+
+textarea:focus {
+	border-bottom: 2px solid #2196F3;
+	margin-bottom: 0px;
+}
+
+textarea:focus:hover {
+	border-bottom: 2px solid #2196F3;
+	margin-bottom: 0px;
+}
+
+textarea:hover {
+	border-bottom: 2px solid #A8A8A8;
+	margin-bottom: 0px;
+}
+
+textarea:disabled:hover {
+	border-bottom: 1px solid #E0E0E0;
+	margin-bottom: 0px;
+}
+
 span.datetime,
 span.multiselect {
 	color: #000000;
@@ -748,6 +786,14 @@ aside .icon {
 	background-image: url("/images/backend/icons/exit_active.png");
 }
 
+.icon.field {
+	background-image: url("/images/backend/icons/field.png");
+}
+
+.icon.field.active {
+	background-image: url("/images/backend/icons/field_active.png");
+}
+
 .icon.files {
 	background-image: url("/images/backend/icons/files.png");
 }
@@ -770,6 +816,14 @@ aside .icon {
 
 .icon.groups.active {
 	background-image: url("/images/backend/icons/groups_active.png");
+}
+
+.icon.history {
+	background-image: url("/images/backend/icons/history.png");
+}
+
+.icon.history.active {
+	background-image: url("/images/backend/icons/history_active.png");
 }
 
 .icon.languages {
@@ -834,6 +888,14 @@ aside .icon {
 
 .icon.statistic.active {
 	background-image: url("/images/backend/icons/statistic_active.png");
+}
+
+.icon.table {
+	background-image: url("/images/backend/icons/table.png");
+}
+
+.icon.table.active {
+	background-image: url("/images/backend/icons/table_active.png");
 }
 
 .icon.transfers {
@@ -1027,7 +1089,7 @@ section > article > section .filters div.input {
 	float: left;
 	height: 48px;
 	margin-right: 24px;
-	width: 380px;
+	width: 375px;
 }
 
 section > article > section .filters label {
@@ -1037,11 +1099,11 @@ section > article > section .filters label {
 section > article > section .filters label.switch {
 	margin-left: 36px;
 	margin-top: -25px;
-	width: 344px;
+	width: 338px;
 }
 
 section > article > section .filters input[type=text] {
-	width: 344px;
+	width: 338px;
 }
 
 section > article > section .filters span.checkbox {

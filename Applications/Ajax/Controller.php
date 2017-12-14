@@ -7,13 +7,15 @@ class Controller extends \Applications\Controller
 	protected $model;
 	protected $view;
 	
-	public function __construct()
+	public function __construct($accesses)
 	{
 		$calledClass = \str_replace(__NAMESPACE__ . '\\', '', get_called_class());
 		$modelClass = '\\Applications\\Models\\' . $calledClass;
 		
 		$this->model = new $modelClass();
 		$this->view = new View();
+		
+		$this->model->setAccesses($accesses);
 	}
 	
 	public function add($data)
@@ -35,7 +37,9 @@ class Controller extends \Applications\Controller
 			'code'	=> 200,
 			'data'	=>
 			[
+				'accesses'	=> $this->model->accesses,
 				'columns'	=> $this->model::$columns,
+				'item'		=> $item,
 				'name'		=> $this->model::$words['add'],
 				'type'		=> 'form'
 			]
@@ -81,6 +85,7 @@ class Controller extends \Applications\Controller
 			'code'	=> 200,
 			'data'	=>
 			[
+				'accesses'	=> $this->model->accesses,
 				'columns'	=> $this->model::$columns,
 				'item'		=> $item,
 				'name'		=> $this->model::$words['item'],
@@ -100,6 +105,7 @@ class Controller extends \Applications\Controller
 			'code'	=> 200,
 			'data'	=>
 			[
+				'accesses'	=> $this->model->accesses,
 				'columns'	=> $this->model::$columns,
 				'items'		=> $items,
 				'name'		=> $this->model::$words['list'],

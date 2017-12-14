@@ -30,7 +30,6 @@ final class Wings
 		require self::$dir . 'Autoloader.php';
 		require self::$dir . 'Exception.php';
 		
-		$this->globalsInterpretation();
 		$this->initialize();
 	}
 	
@@ -85,6 +84,8 @@ final class Wings
 		$settings = $this->getSettings();
 		
 		$this->setCoreSettings($settings);
+		
+		$this->globalsInterpretation();
 		
 		\Wings\DB::init($settings['db']);
 		

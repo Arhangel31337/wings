@@ -228,7 +228,11 @@ function pageShow(pageNumber, reverse = 1, changePage = false)
 		
 		var prevMenu = $('article[page=' + i + '] .menu');
 		prevMenu.find('.icon span').stop(true, true).hide(500);
-		$('article[page=' + (i + 1) + ']').animateNew({width : width, marginLeft : marginLeft});
+		$('article[page=' + (i + 1) + ']').animateNew({width : width, marginLeft : marginLeft}, function() {
+			autosize.update($(this).find('textarea'));
+    		
+    		$('select').selectmenu();
+		});
 		prevMenu.find('.icon.fl-r').first().animateNew({marginRight : marginRight});
 	}
 	
@@ -339,7 +343,7 @@ function updatePage(pageNumber, allPage)
 					
 					if (allPage && pages.length > pageNumber) updatePage(pageNumber, allPage);
 				}
-				else if (json.code === 403)
+				else if (json.code === 401)
 				{
 					popupShow(json.description);
 					setTimeout(function() {

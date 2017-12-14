@@ -120,6 +120,6 @@ class Exception extends \Exception
 	}
 }
 
-\set_error_handler(\create_function('$errorNumber, $errorString, $errorFile, $errorLine, $errorContext', '\Wings\Exception::error($errorNumber, $errorString, $errorFile, $errorLine, $errorContext);'), E_ALL);
-\set_exception_handler(\create_function('$exceptionHandler', '\Wings\Exception::exception($exceptionHandler);'));
-\register_shutdown_function(\create_function('', '\Wings\Exception::shutdown();'));
+\set_error_handler("\Wings\Exception::error", E_ALL);
+\set_exception_handler("\Wings\Exception::exception");
+\register_shutdown_function("\Wings\Exception::shutdown");

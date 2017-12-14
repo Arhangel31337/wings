@@ -11,11 +11,13 @@ final class Index
 		\Wings::$view['tpl'] = 'default.tpl';
 		
 		\Wings::$view['files']['css'][] = 'https://fonts.googleapis.com/css?family=Roboto:400,500,700&subset=latin,cyrillic-ext';
+		\Wings::$view['files']['css'][] = '/css/backend/jquery-ui.css';
 		\Wings::$view['files']['css'][] = '/css/backend/reset.css';
 		\Wings::$view['files']['css'][] = '/css/backend/style.css';
 		
 		\Wings::$view['files']['js'][] = ['async' => false, 'src' => '/js/jquery.min.js'];
 		\Wings::$view['files']['js'][] = ['async' => false, 'src' => '/js/jquery-ui.min.js'];
+		\Wings::$view['files']['js'][] = ['async' => false, 'src' => '/js/autosize.min.js'];
 		\Wings::$view['files']['js'][] = ['async' => false, 'src' => '/js/BackEnd/functions.js'];
 		\Wings::$view['files']['js'][] = ['async' => false, 'src' => '/js/BackEnd/elements.js'];
 		

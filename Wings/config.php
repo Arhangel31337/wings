@@ -49,7 +49,7 @@ return [
 	],
 	'php'		=>
 	[
-		'display_errors'			=> 'on',
+		'display_errors'			=> 'off',
 		'log_errors'				=> 'on',
 		'register_globals'			=> 'Off',
 		'magic_quotes_gpc'			=> 'Off',

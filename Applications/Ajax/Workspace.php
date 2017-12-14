@@ -12,7 +12,7 @@ final class Workspace
 		{
 			$data =
 			[
-				'code'			=> 403,
+				'code'			=> 401,
 				'description'	=> 'Необходимо авторизоваться.'
 			];
 			
@@ -52,7 +52,7 @@ final class Workspace
 		
 		if ($access !== true) return $view->json($access);
 		
-		$mvc = new $mvc();
+		$mvc = new $mvc($accesses);
 		
 		$mvc->$method(\Wings::$post);
 	}

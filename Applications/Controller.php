@@ -5,7 +5,7 @@ class Controller
 {
 	public static function checkAccess($accesses, $type)
 	{
-		if ($accesses[$type] === 0)
+		if ($accesses[$type] == 0)
 		{
 			return
 			[

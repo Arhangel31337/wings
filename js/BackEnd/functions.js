@@ -2,8 +2,9 @@ var monthsNameIP = ['Январь', 'Февраль', 'Март', 'Апрель'
 var monthsNameRP = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня', 'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'];
 
 (function($) {
-	$.fn.animateNew = function(options) {
-		$(this).stop(true, true).animate(options);
+	$.fn.animateNew = function(options, callback) {
+		if ((typeof callback) === 'function') $(this).stop(true, true).animate(options, callback);
+		else $(this).stop(true, true).animate(options);
 	};
 	
     $.fn.blockInCenter = function() {
@@ -531,6 +532,15 @@ var monthsNameRP = ['Января', 'Февраля', 'Марта', 'Апрел�
 				else el.inputError('show', check);
 			});
 		});
+    };
+	
+    $.fn.prepareSelect = function(needCheckbox) {
+    	return this.each(function() {
+    		var el = $(this);
+    		el.wrap('<div class="input" />');
+    		
+    		el.selectmenu();
+    	});
     };
 	
     $.fn.prepareSpan = function(needCheckbox) {
