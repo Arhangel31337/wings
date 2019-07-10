@@ -39,9 +39,6 @@ final class Workspace
 			case 'change':
 				$access = \Applications\Controller::checkAccess($accesses, 'update');
 				break;
-			case 'item':
-				$access = \Applications\Controller::checkAccess($accesses, 'select');
-				break;
 			case 'remove':
 				$access = \Applications\Controller::checkAccess($accesses, 'delete');
 				break;

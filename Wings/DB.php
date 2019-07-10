@@ -26,6 +26,16 @@ final class DB
 	const			TRANSACTION_STOP	= false;
 	
 	/**
+	 * 
+	 */
+	public static function calcFoundRows()
+	{
+		$query = 'SELECT FOUND_ROWS();';
+		
+		return self::fetchOne($query);
+	}
+	
+	/**
 	 * Удаления записи из таблицы
 	 *
 	 * @param string $table - наименование таблицы в БД

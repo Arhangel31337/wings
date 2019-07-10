@@ -284,6 +284,11 @@ Form.prototype.createHTML = function()
 
 function Table(data)
 {
+	this.count = data.count - 0;
+	this.limit = data.limit - 0;
+	this.start = data.start - 0;
+	this.order = data.order;
+	
 	Table.superclass.constructor.call(this, data);
 };
 
@@ -299,7 +304,7 @@ Table.prototype.createHTML = function()
 			'<div class="cl-b"></div>' +
 		'</div>' +
 		'<div class="filters"></div>' +
-		'<table><thead></thead><tbody></tbody></table>'
+		'<table><thead></thead><tfoot></tfoot><tbody></tbody></table>'
 	);
 	
 	if (table.delegate === null)
@@ -313,6 +318,7 @@ Table.prototype.createHTML = function()
 	var filters = $(html[2]);
 	var tableData = $(html[3]);
 	var ths = $('<tr></tr>');
+	var paginator = $('<tr class="paginator"></tr>');
 	
 	for (var i = 0; i < table.turnCol.length; i++)
 	{
@@ -352,19 +358,56 @@ Table.prototype.createHTML = function()
 	
 	filters.append('<div class="cl-b"></div>');
 	
+	var to = table.start + table.limit;
+	
+	if (to > table.count) to = table.count;
+	
+	paginator.append($(
+		'<th colspan="' + (table.turnCol.length + 1) + '">' +
+			'<div class="icon prev fl-l">' +
+				'<span>Предыдущие</span>' +
+			'</div>' +
+			'<div class="icon next fl-r">' +
+				'<span>Следующие</span>' +
+			'</div>' +
+			'<div class="result">' +
+				'Строки с ' + (+table.start + 1) +
+				' по ' + to +
+				' из ' + table.count +
+				' показывать по <input class="ta-c" type="text" name="rowsInPage" value="' + table.limit + '" style="width: 30px;" />' +
+			'</div>' +
+			'<div class="cl-b"></div>' +
+		'</th>'
+	));
+	
 	if (table.delegate !== null) ths.append($('<th></th>').width(24));
 	else ths.append($('<th><input type="checkbox" name="trAll" /></th>').width(24));
+	
+	var regExp = /`([^`]*)` (.*)/g;
+	
+	regExp = regExp.exec(table.order);
 	
 	for (var i = 0; i < table.turnCol.length; i++)
 	{
 		if (table.columns[table.turnCol[i]].isFormF) continue;
 		
-		var th = $('<th key="' + i + '">' + table.columns[table.turnCol[i]].name + '</th>');
+		var th = $('<th key="' + table.turnCol[i] + '">' + table.columns[table.turnCol[i]].name + '</th>');
 		
-		if (table.turnCol[i] == 'id') th.css('width', '50px');
+		if (table.turnCol[i] === 'id') th.css('width', '50px');
 		
 		if (table.columns[table.turnCol[i]].style !== undefined &&
 			table.columns[table.turnCol[i]].style.align !== undefined) th.css('text-align', table.columns[table.turnCol[i]].style.align);
+		
+		if (regExp.length === 3 && regExp[1] === table.turnCol[i])
+		{
+			if (regExp[2] === 'ASC') th.prepend('<span class="icon up"></span>');
+			else th.prepend('<span class="icon down"></span>');
+			
+			var iconWidth = th.find('span.icon').css('width').replace('px', '');
+			
+			if (th.css('text-align') != 'left') th.find('span.icon').css('margin-left', -24 + 'px');
+			else th.find('span.icon').css('margin-left', -24 + 'px');
+		}
 		
 		ths.append(th);
 	}
@@ -397,7 +440,44 @@ Table.prototype.createHTML = function()
 		tableData.children('tbody').append(tds);
 	}
 	
+	tableData.children('thead').append(paginator.clone());
 	tableData.children('thead').append(ths);
+	tableData.children('tfoot').append(paginator.clone());
+	
+	tableData.find('.paginator input[name=rowsInPage]').change(function() {
+		var val = $(this).val() - 0;
+		
+		if (!Number.isInteger(val) || val < 0) return false;
+		
+		var key = table.currentPage - 1;
+		
+		pages[key].args.limit = val;
+		pages[key].args.start = 0;
+		
+		updatePage(key);
+	});
+	
+	tableData.find('.paginator .prev').click(function() {
+		if ((table.start - table.limit) < 0) return false;
+		
+		var key = table.currentPage - 1;
+		
+		pages[key].args.limit = table.limit;
+		pages[key].args.start = table.start - table.limit;
+		
+		updatePage(key);
+	});
+	
+	tableData.find('.paginator .next').click(function() {
+		if ((table.start + table.limit) >= table.count) return false;
+		
+		var key = table.currentPage - 1;
+		
+		pages[key].args.limit = table.limit;
+		pages[key].args.start = table.start + table.limit;
+		
+		updatePage(key);
+	});
 	
 	filters.on('click', '.checkbox', function(e) {
 		var el = $(this).children('input');
@@ -568,36 +648,18 @@ Table.prototype.createHTML = function()
 	
 	tableData.find('thead th').not(':first-child').click(function(e) {
 		var th = $(this);
-		var sortDown = th.children('span').hasClass('down');
+		
+		var key = table.currentPage - 1;
+		var sort =' ASC';
+		if (th.children('span').length > 0 && th.children('span').hasClass('up')) sort = ' DESC';
 		
 		tableData.find('thead span.up, thead span.down').remove();
 		
-		if (sortDown) th.prepend('<span class="icon up"></span>');
-		else th.prepend('<span class="icon down"></span>');
+		pages[key].args.order = '`' + th.attr('key') + '`' + sort;
+		pages[key].args.limit = table.limit;
+		pages[key].args.start = 0;
 		
-		var iconWidth = th.find('span.icon').css('width').replace('px', '');
-		
-		if (th.css('text-align') != 'left') th.find('span.icon').css('margin-left', ((th.outerWidth() - iconWidth) / 2) + 'px');
-		else th.find('span.icon').css('margin-left', (th.outerWidth() - iconWidth * 2) + 'px');
-		
-		var key = th.attr('key');
-		var trs = tableData.find('tbody tr');
-		
-		trs.sort(function(a, b) {
-			var sort = 0;
-			
-			a = $(a).find('td[key=' + key + ']').text();
-			b = $(b).find('td[key=' + key + ']').text();
-			
-			if (a > b) sort = 1;
-			if (a < b) sort = -1;
-			
-			if (sortDown) sort *= -1;
-			
-			return sort;
-		});
-		
-		tableData.find('tbody').html(trs);
+		updatePage(key);
 	});
 	
 	if (table.delegate === null)

@@ -36,6 +36,7 @@
 {if isset($page.pageTitle)}
 	<title>{$page.pageTitle}</title>
 {/if}
+	<link rel="icon" href="/images/backend/favicon.png" />
 {if isset($files.css) && !empty($files.css)}	
 	{foreach from=$files.css item=css}
 <link rel="stylesheet" type="text/css" href="{$css}" />

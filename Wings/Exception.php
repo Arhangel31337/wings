@@ -61,7 +61,7 @@ class Exception extends \Exception
         self::$errorFile = $exceptionHandler->getFile();
         self::$errorLine = $exceptionHandler->getLine();
         self::$errorDescription = '';
-        self::$errorTrace = \array_slice(\debug_backtrace(), 2);
+        self::$errorTrace = \debug_backtrace()[0]['args'][0]->getTrace();
         self::Report('Report' . self::$debugType);
     }
 	

@@ -150,7 +150,7 @@ abstract class Model
 		DB::delete($model::$table, $wheres, $args);
 	}
 	
-	public function getAll($model = null)
+	public function getAll($model = null, $filters = null, $order = null, $start = null, $limit = null)
 	{
 		if (\is_null($model)) $model = $this;
 		
@@ -161,7 +161,11 @@ abstract class Model
 		if ($model::$tree !== '') $result = \Wings\Tree\NestedSets::selectAll($model::$table, $columns, $joins);
 		else
 		{
-			$query = 'SELECT ' . $columns . ' FROM `' . $model::$table . '` ' . $joins;
+			$query = 'SELECT SQL_CALC_FOUND_ROWS ' . $columns . ' FROM `' . $model::$table . '` ' . $joins;
+			
+			if (!\is_null($order)) $query .= ' ORDER BY ' . $order;
+			if (\is_numeric($start) && \is_numeric($limit)) $query .= ' LIMIT ' .  $start . ', ' . $limit;
+			
 			$result = DB::fetchAll($query);
 		}
 		
@@ -211,8 +215,7 @@ abstract class Model
 		$item =
 		[
 			'id'		=> $result[0]['id'],
-			'code'		=> $result[0]['code'],
-			'nameEn'	=> $result[0]['nameEn']
+			'code'		=> $result[0]['code']
 		];
 		
 		foreach ($model::$multilang as $column)
@@ -279,7 +282,6 @@ abstract class Model
 		{
 			$columns[] = '`Language`.`id` AS `lang`';
 			$columns[] = '`Language`.`code` AS `code`';
-			$columns[] = '`Language`.`nameEn` AS `nameEn`';
 			
 			foreach ($model::$multilang as $field) $columns[] = 'IFNULL(`lang_' . $model::$table . '`.`' . $field . '`, "") AS `' . $field . '`';
 			

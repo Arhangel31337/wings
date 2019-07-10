@@ -1,4 +1,4 @@
-<?php /* Smarty version Smarty-3.1.21-dev, created on 2017-11-27 11:50:15
+<?php /* Smarty version Smarty-3.1.21-dev, created on 2018-11-07 14:56:19
          compiled from "C:\Program Files (x86)\Zend\Apache24\htdocs\wings\Templates\BackEnd\head.tpl" */ ?>
 <?php /*%%SmartyHeaderCode:17014529115a1bd1c7787643-42845280%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
@@ -7,7 +7,7 @@ $_valid = $_smarty_tpl->decodeProperties(array (
     'bd9fae3c5e2ace6feb9c795091b2f1c7f42ff7a5' => 
     array (
       0 => 'C:\\Program Files (x86)\\Zend\\Apache24\\htdocs\\wings\\Templates\\BackEnd\\head.tpl',
-      1 => 1505912693,
+      1 => 1541591775,
       2 => 'file',
     ),
   ),
@@ -15,6 +15,8 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   'function' => 
   array (
   ),
+  'version' => 'Smarty-3.1.21-dev',
+  'unifunc' => 'content_5a1bd1c7873b55_20251562',
   'variables' => 
   array (
     'charset' => 0,
@@ -27,8 +29,6 @@ $_valid = $_smarty_tpl->decodeProperties(array (
     'js' => 0,
   ),
   'has_nocache_code' => false,
-  'version' => 'Smarty-3.1.21-dev',
-  'unifunc' => 'content_5a1bd1c7873b55_20251562',
 ),false); /*/%%SmartyHeaderCode%%*/?>
 <?php if ($_valid && !is_callable('content_5a1bd1c7873b55_20251562')) {function content_5a1bd1c7873b55_20251562($_smarty_tpl) {?><head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -92,6 +92,7 @@ $_smarty_tpl->tpl_vars['value']->_loop = true;
 	<title><?php echo $_smarty_tpl->tpl_vars['page']->value['pageTitle'];?>
 </title>
 <?php }?>
+	<link rel="icon" href="/images/backend/favicon.png" />
 <?php if (isset($_smarty_tpl->tpl_vars['files']->value['css'])&&!empty($_smarty_tpl->tpl_vars['files']->value['css'])) {?>	
 	<?php  $_smarty_tpl->tpl_vars['css'] = new Smarty_Variable; $_smarty_tpl->tpl_vars['css']->_loop = false;
  $_from = $_smarty_tpl->tpl_vars['files']->value['css']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array');}

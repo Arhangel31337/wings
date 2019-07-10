@@ -176,31 +176,31 @@ label {
 }
 
 .cl-b {
-	clear: both;
+	clear: both !important;
 }
 
 .d-n {
-	display: none;
+	display: none !important;
 }
 
 .fl-l {
-	float: left;
+	float: left !important;
 }
 
 .fl-r {
-	float: right;
+	float: right !important;
 }
 
 .fs-i {
-	font-style: italic;
+	font-style: italic !important;
 }
 
 .h-a {
-	height: auto;
+	height: auto !important;
 }
 
 .ta-c {
-	text-align: center;
+	text-align: center !important;
 }
 
 .ta-l {
@@ -208,11 +208,11 @@ label {
 }
 
 .ta-r {
-	text-align: right;
+	text-align: right !important;
 }
 
 .va-t {
-	vertical-align: top;
+	vertical-align: top !important;
 }
 
 .error {
@@ -1122,6 +1122,46 @@ table tr {
 
 table thead tr {
 	border-top: none;
+}
+
+table tr.paginator {
+	cursor: default;
+}
+
+table tr.paginator div {
+	color: #000000;
+}
+
+table tr.paginator div.icon {
+	background-repeat: no-repeat;
+	cursor: pointer;
+	display: block;
+	height: 24px;
+	width: 112px;
+}
+
+table tr.paginator div.icon:hover {
+	color: #2196F3;
+}
+
+table tr.paginator div.icon.prev {
+	background-image: url("/images/backend/icons/keyboard_arrow_left.png");
+	background-position: 0px 1px;
+	padding-left: 32px;
+}
+
+table tr.paginator div.icon.prev:hover {
+	background-image: url("/images/backend/icons/keyboard_arrow_left_active.png");
+}
+
+table tr.paginator div.icon.next {
+	background-image: url("/images/backend/icons/keyboard_arrow_right.png");
+	background-position: 96px 1px;
+	padding-right: 32px;
+}
+
+table tr.paginator div.icon.next:hover {
+	background-image: url("/images/backend/icons/keyboard_arrow_right_active.png");
 }
 
 table tbody tr.selected,

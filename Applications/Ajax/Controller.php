@@ -98,7 +98,15 @@ class Controller extends \Applications\Controller
 	
 	public function list($data)
 	{
-		$items = $this->model->getAll();
+		$start = 0;
+		$limit = 10;
+		$order = '`' . \key($this->model::$columns) . '`' . ' ASC';
+		
+		if (isset(\Wings::$post['start']) && \is_numeric(\Wings::$post['start'])) $start = \Wings::$post['start'];
+		if (isset(\Wings::$post['limit']) && \is_numeric(\Wings::$post['limit'])) $limit = \Wings::$post['limit'];
+		if (isset(\Wings::$post['order'])) $order = \urldecode(\Wings::$post['order']);
+		
+		$items = $this->model->getAll(null, null, $order, $start, $limit);
 		
 		$items =
 		[
@@ -107,8 +115,12 @@ class Controller extends \Applications\Controller
 			[
 				'accesses'	=> $this->model->accesses,
 				'columns'	=> $this->model::$columns,
+				'count'		=> \Wings\DB::calcFoundRows(),
 				'items'		=> $items,
+				'limit'		=> $limit,
 				'name'		=> $this->model::$words['list'],
+				'order'		=> $order,
+				'start'		=> $start,
 				'type'		=> $this->model::$type
 			]
 		];
